@@ -17,6 +17,7 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
+    "react-file-picker-preview": "0.0.9",
     "react-native": "^0.62.2",
     "react-scripts": "3.4.1",
     "solid-auth-client": "^2.4.1",

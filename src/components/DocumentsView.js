@@ -8,6 +8,8 @@ import {FileBrowser, FileView} from 'chonky';
 import solid from 'solid-auth-client'
 import CommunicationManager from '../util/CommunicationManager';
 
+import "./DocumentsView.css"
+
 
 export default class DocumentsView extends React.Component {
     constructor(props) {
@@ -35,7 +37,6 @@ export default class DocumentsView extends React.Component {
         let documents = await this.cm.getResearchPapers(webId);
         for (let document of documents) {
           fileData.set(document.id, document)
-          console.log("DOCUMENT", document)
           document.name = document.title || document.id.split["/"].slice(document.id.split["/"].length-1).split(".")[0]
           document.ext = document.id.split(".")[document.id.split(".").length-1]
         }
@@ -65,10 +66,11 @@ export default class DocumentsView extends React.Component {
       const {files} = this.state;
 
       return (
-        <div className="documentsviewcontainer">
+        <div className="documentsviewcontainer disable-scrollbars">
           <FileBrowser ref={this.chonkyRef}
             files={files} view={FileView.SmallThumbs}
             onSelectionChange={this.handleSelectionChange}/>
+          <div className="refreshDivButton" onClick={() => {this.asyncUpdate()}}>Refresh</div>
         </div>
       )
     }

@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import CommunicationManager from 'util/CommunicationManager';
 
+import "./AsyncListItem.css"
 
 
 export default class AsyncListItemNotification extends React.Component {
@@ -60,6 +61,7 @@ export default class AsyncListItemNotification extends React.Component {
   }
 
   async getCreatorName(creatorId){
+    if(!creatorId) {console.error("No creator name for notifcation."); return}
     const name = await this.cm.getFullNameFromProfile(creatorId)
     if(!this.running || !name) return
     if(name) this.setState({creatorName: name})
@@ -70,10 +72,11 @@ export default class AsyncListItemNotification extends React.Component {
   }
 
   render () {
+    // const imagesrc = this.state.notification.type && this.state.notification.type=
     return (
       <div key={this.state.notification.id}>
       
-        <ListItem alignItems="flex-start">
+        <ListItem className="flex-start listitem">
           <ListItemAvatar>
             <Avatar alt={this.state.creatorName} src={require("../assets/comment.svg")}  />
           </ListItemAvatar>

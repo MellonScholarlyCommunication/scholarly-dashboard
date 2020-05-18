@@ -7,6 +7,7 @@ import MainContent from './components/MainContent';
 import NotificationsSideBar from 'components/NotificationsSideBar';
 import CommunicationManager from 'util/CommunicationManager';
 import solid from 'solid-auth-client'
+import CommentAddComponent from 'components/CommentAddComponent';
 
 export default class APP extends React.Component {
 

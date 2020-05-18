@@ -1,9 +1,5 @@
-import {
-  MetadataFileGenerator
-} from "./MetadataFileGenerator";
-import {
-  FileUtil
-} from "./FileUtil";
+import MetadataFileGenerator from "./MetadataFileGenerator";
+import { FileUtil } from "./FileUtil";
 import * as N3 from "n3"
 
 const FOAF = "http://xmlns.com/foaf/0.1/";
@@ -15,7 +11,7 @@ const HYDRA = "http://www.w3.org/ns/hydra/core#";
 const RESEARCH_PAPER_CLASS = "http://example.com/ResearchPaper";
 const XSD = "http://www.w3.org/2001/XMLSchema#";
 const SIOC = "http://rdfs.org/sioc/ns#"
-const AS = "https://www.w3.org/ns/activitystreams"
+const AS = "https://www.w3.org/ns/activitystreams#"
 
 
 const DEFAULTPAPERSDIRECTORY = "papers/";
@@ -436,10 +432,7 @@ export default class CommunicationManager {
   }
 
   async getNotificationFromId(notificationId: string): Promise < Notification > {
-
-    console.log("getNotificationFromId", notificationId)
     let store = await this.getDataStoreFromFile(notificationId);
-    console.log("store", store)
     const typeQuad = await store.getQuads(notificationId, RDF + "type", null, null)[0]
     const type = typeQuad && (typeQuad.object.id || typeQuad.object.value)
 

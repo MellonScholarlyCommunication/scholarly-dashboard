@@ -9,11 +9,11 @@ const RESEARCH_PAPER_CLASS = "http://example.com/ResearchPaper";
 const HYDRA = "http://www.w3.org/ns/hydra/core#";
 const XSD = "http://www.w3.org/2001/XMLSchema#";
 const SIOC = "http://rdfs.org/sioc/ns#";
-const AS = "https://www.w3.org/ns/activitystreams";
+const AS = "https://www.w3.org/ns/activitystreams#";
 
 const { namedNode, literal, defaultGraph, quad } = DataFactory;
 
-export class MetadataFileGenerator {
+export default class MetadataFileGenerator {
   static generatePaperCollection(
     collectionId: string,
     partialCollectionViewId: string

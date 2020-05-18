@@ -45,7 +45,7 @@ export default class MainContent extends React.Component {
   render () {
     const view = this.state.collection ? <DocumentsView handleSelection={this.handleSelection} cm={this.cm} /> : <InitializePaperCollectionComponent cm={this.cm} />
     return (
-      <div className="maincontent disable-scrollbars">
+      <div className="maincontent">
         {view}
       </div>  
     )

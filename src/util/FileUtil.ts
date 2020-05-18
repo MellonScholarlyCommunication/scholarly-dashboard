@@ -24,7 +24,6 @@ export class FileUtil {
   }
 
   async patchFile(fileURL: string, content: string) {
-    console.log("Patching file", fileURL, content);
     return await this.auth.fetch(fileURL, {
       method: "PATCH",
       headers: {
@@ -37,17 +36,12 @@ export class FileUtil {
 
   // Post file from string
   async postFile(fileURL: string, content: string, contentType: string) {
-    console.log("Posting file", fileURL, content);
     return await this.fc.postFile(fileURL, content, contentType);
   }
 
   async postAndPatchFile(fileURL: string, content: string){
     const post = await this.postFile(fileURL, content, "text/turtle")
-    console.log("postResult", post)
     return post
-    // const patch = await this.patchFile(fileURL, content)
-    // console.log("patchresult", patch)
-    // return Promise.all([post, patch])
   }
 
   // Post file from file

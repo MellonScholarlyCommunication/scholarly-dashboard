@@ -1,7 +1,6 @@
 .maincontent {
   height: 100%;
   width: 100%;
-  overflow: scroll;
 }
 .disable-scrollbars::-webkit-scrollbar {
   width: 0px;

@@ -27,7 +27,7 @@ export default class InitializePaperCollectionComponent extends React.Component 
 
   render () {
     return (
-      <button onClick={this.initializeCollection}>Initialize collection to store research papers</button>
+      <button onClick={ () => {this.initializeCollection()}}>Initialize collection to store research papers</button>
     )
   }
 }

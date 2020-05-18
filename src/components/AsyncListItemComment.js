@@ -9,6 +9,8 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import CommunicationManager from 'util/CommunicationManager';
 
+import "./AsyncListItem.css"
+
 
 
 export default class AsyncListItemComment extends React.Component {
@@ -51,6 +53,7 @@ export default class AsyncListItemComment extends React.Component {
   async initComponent(){
     const comment = await this.cm.getCommentData(this.state.comment.id);
     if(!this.running || !comment) return
+    this.props.updateDate({id: this.state.comment.id, date: comment.createdAt})
     this.setState({comment: comment})
     this.getCreatorName(comment.creator)
   }
@@ -66,11 +69,13 @@ export default class AsyncListItemComment extends React.Component {
   }
 
   render () {
-    const header = <div>In reply to: <a href={this.state.comment.replyOf}>{this.state.comment.replyOf}</a> at: this.state.comment.replyOf && this.state.comment.replyOf.toString() </div>
+    const timeString = this.state.comment.createdAt ? this.state.comment.createdAt.toLocaleString() : "";
+    const paperMetadata = Object.values(this.props.selection)[0]
+    const header = <div>{timeString} In reply to: <a href={this.state.comment.replyOf}>{paperMetadata.title}</a></div>
     return (
       <div key={this.props.id}>
-      
-        <ListItem alignItems="flex-start">
+    
+        <ListItem className="flex-start listitem" >
           <ListItemAvatar>
             <Avatar alt={this.state.creatorName} src={require("../assets/comment.svg")}  />
           </ListItemAvatar>

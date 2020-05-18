@@ -1,10 +1,13 @@
 import React from 'react';
 import solid from 'solid-auth-client'
 import CommunicationManager, { Comment } from '../util/CommunicationManager';
-import "./CommentsSidebar.css"
 
 import AsyncListItemComment from "./AsyncListItemComment"
 import List from '@material-ui/core/List';
+import CommentAddComponent from './CommentAddComponent';
+
+import "./Sidebar.css"
+const REFRESHRATE=10000
 
 
 export default class CommentsSidebar extends React.Component {
@@ -14,18 +17,29 @@ export default class CommentsSidebar extends React.Component {
     this.cm = props.cm || new CommunicationManager(solid);
 
     this.state = {
-      comments: [],
+      commentIds: [],
+      commentDates: [],
     };
     this.update = this.update.bind(this)
+    this.updateDate = this.updateDate.bind(this);
+    this.getDateForId = this.getDateForId.bind(this);
+    this.running = false;
+    this.timeout = null;
+    this.updaterunning = false;
   }
 
   getNewState(){
-    return ({ comments: [] })
+    return ({ commentIds: [], commentDates: [] })
   }
-  
-  componentDidMount(){
-    console.log("COMPDIDMOUNT")
-    this.update()
+
+  componentDidMount() {
+    this.running = true
+    this.update();
+    this.timeout = setInterval(this.update, REFRESHRATE);
+  }
+  componentWillUnmount() {
+    this.running = false;
+    clearInterval(this.timeout);
   }
 
   componentDidUpdate(prevprops, prevstate){
@@ -34,70 +48,85 @@ export default class CommentsSidebar extends React.Component {
       this.update()
     }
   }
-  // componentDidUpdate(prevprops, prevstate){
-  //   console.log("COMPONENTDIDUPDATE", this.state, prevstate, this.props, prevprops)
-  //   if (this.props.selection !== prevprops.selection) {
-  //     this.update()
-  //     return;
-  //   }
-  //   const currentCommentIds = this.state.comments.map(comment => comment.id).sort()
-  //   const prevCommentIds = prevstate.comments.map(comment => comment.id).sort()
-  //   for (let i = 0; i < currentCommentIds.length; i++) {
-  //     if(currentCommentIds[i] !== prevCommentIds[i]){
-  //       this.update();
-  //       return;
-  //     }
-  //   }
-  // }
-  // async update(){
-  //   console.log("update sidebar", this.props)
-  //   let commentIds = []
-  //   for (let documentId of Object.keys(this.props.selection)) {
-  //     console.log("doc", documentId, this.props.selection[documentId])
-  //     commentIds = commentIds.concat(await this.cm.getPaperCommentIds(this.props.selection[documentId]))
-  //   }
 
-  //   let comments = [];
-  //   for (let commentId of commentIds) {
-  //     comments.push(await this.cm.getCommentData(commentId));
-  //   }
-  //   this.setState({comments: comments})
-  // }
+  shouldComponentUpdate(nextprops, nextstate) {
+    console.log("ceck component updates", this.state.commentDates, nextstate.commentDates)
+    if(Object.keys(this.props.selection)[0] !== Object.keys(nextprops.selection)[0]){
+      console.log("newProps")
+      return true
+    }
+    if(nextstate.commentIds.length !== this.state.commentIds.length) return true;
+    for (let i = 0; i < nextstate.commentIds.length; i++) {
+      if (nextstate.commentIds[i] !== this.state.commentIds[i]) {
+        console.log("newComment")
+        return true;
+      }
+    } 
+    if(nextstate.commentDates.length !== this.state.commentDates.length) return true;
+    for (let i = 0; i < nextstate.commentDates.length; i++) {
+      if (nextstate.commentDates[i] !== this.state.commentDates[i]) {
+        console.log("newDates")
+        return true;
+      }
+    } 
+    console.log("nothing")
+    return false;
+  }
 
-  // generateListView(comments) {
-  //   let items = comments.map(comment => { 
-  //     let commentString = JSON.stringify(comment, null, 2)
-  //     return <div key={comment.id}>
-  //       {commentString}
-  //     </div>
-  //   })
-  //   console.log("ITEMS")
-  //   return items
-  // }
-
+  updateDate(updateObj) {
+    console.log("updating date", updateObj)
+    let newCommentDates = this.state.commentDates.slice();
+    for (let i = 0; i < newCommentDates.length; i++){
+      if(newCommentDates[i].id === updateObj.id) {
+        //the date as already been set once
+        return;
+      }
+    }
+    newCommentDates.push(updateObj)
+    this.setState({commentDates: newCommentDates})
+  }
 
   async update(){
-    const session = await solid.currentSession()
-    const webId = session.webId
-    console.log("update notifications", webId)
+    if(this.updaterunning) {return}
+    this.updaterunning = true;
+    const documentMetadata = Object.values(this.props.selection)[0]
+    console.log("updating comments", documentMetadata.title)
+    let commentIds = (await this.cm.getPaperCommentIds(documentMetadata))
+    if(commentIds)
+      this.setState({commentIds: commentIds});
+    this.updaterunning = false;
+  }  
 
-    const documentId = Object.keys(this.props.selection)[0]
-    let comments = await this.cm.getPaperCommentIds(this.props.selection[documentId])
-    if(comments)
-      this.setState({comments: comments});
+  getDateForId(id){
+    let commentDates = this.state.commentDates
+    for (let e of commentDates){
+      if(e.id === id) {
+        return e
+      }
+    }
+    return {id: id, date: null};
   }
 
   render(){
-    let notificationList = this.state.comments.map(commentId => {return(
-      <AsyncListItemComment id={commentId} cm={this.cm}/>
+    let idsWithDates = this.state.commentIds.map(commentId => this.getDateForId(commentId))
+    console.log("idsWithDates", JSON.stringify(idsWithDates, null, 2))
+    idsWithDates.sort(function(a, b) {console.log("comparing", JSON.stringify(a), JSON.stringify(b)); if(!b.date) return a; if(!a.date) return b; return b.date.getTime() - a.date.getTime()})
+    console.log("sortedComments", JSON.stringify(idsWithDates, null, 2))
+    let commentsList = idsWithDates.map(commentId => {return(
+      <AsyncListItemComment key={commentId.id} id={commentId.id} selection={this.props.selection} updateDate={this.updateDate} cm={this.cm}/>
     )})
 
     return (
-      <div className="notificationsContainer">
-        <button onClick={this.update}>SYNC</button>
-        <List>
-          {notificationList}
-        </List>
+      <div className="sidebarcomponentcontainer">
+        <div className="uppercontainer">
+          <p>Comments</p>
+          <List className="disable-scrollbars">
+            {commentsList}
+          </List>
+        </div>
+        <div className="lowercontainer disable-scrollbars">
+          <CommentAddComponent className="commentAdd" selection={this.props.selection}/>
+        </div>
       </div>
     );
   }
