@@ -7,7 +7,7 @@ import AsyncListItemNotification from "./AsyncListItemNotification"
 import List from '@material-ui/core/List';
 import "./Sidebar.css"
 import { UploadFileComponent } from './UploadFileComponent';
-const REFRESHRATE = 10000
+const REFRESHRATE = 1000
 
 export default class NotificationsSideBar extends React.Component {
 
@@ -22,9 +22,9 @@ export default class NotificationsSideBar extends React.Component {
   }
   
   componentDidMount() {
+    this.timeout = setInterval(this.update, REFRESHRATE); 
     this.running = true
     this.update();
-    this.timeout = setInterval(this.update, REFRESHRATE); 
   }
   componentWillUnmount() {
     this.running = false

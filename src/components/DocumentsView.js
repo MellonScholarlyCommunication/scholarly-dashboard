@@ -7,6 +7,7 @@ import {FileBrowser, FileView} from 'chonky';
 
 import solid from 'solid-auth-client'
 import CommunicationManager from '../util/CommunicationManager';
+import InitializePaperCollectionComponent from "./InitializePaperCollectionComponent"
 
 import "./DocumentsView.css"
 
@@ -16,37 +17,58 @@ export default class DocumentsView extends React.Component {
         super(props);
 
         this.cm = props.cm || new CommunicationManager(solid);
-        const files = [];
+        this.fileData = new Map()
+        this.webId = ""
         this.state = {
-            files: files,
-            fileData: new Map()
+            searchId: "",
+            files: [],
+            collection: false
         };
+
         this.chonkyRef = React.createRef();
         this.handleSelectionChange = this.handleSelectionChange.bind(this)
+        this.changeSearchId = this.changeSearchId.bind(this)
+        this.updateSearchId = this.updateSearchId.bind(this)
+        this.initializedCollection = this.initializedCollection.bind(this)
+        
     }
+
     componentDidMount(){
-      this.asyncUpdate();
+      this.asyncInit();
+    }
+
+    async asyncInit() {
+      const session = await solid.currentSession()
+      if(!session) return
+      this.webId = session.webId
+      if(! this.webId) return;
+      let collection = await this.cm.getResearchPaperCollectionFromFile(this.webId);
+      this.setState({searchId: this.webId, collection: !!collection})
+      this.asyncUpdate(this.state.searchId);
     }
   
-    async asyncUpdate(){
-      const session = await solid.currentSession()
-      const webId = session.webId
-      console.log("webId", webId)
+    async asyncUpdate(searchId){
+      console.log("getting", this.state, this.webId)
+      if(!this.state.collection) return;
+      const webId = searchId || this.webId
       const fileData = new Map();
-      if(webId && await solid.currentSession()) {
-        let documents = await this.cm.getResearchPapers(webId);
-        for (let document of documents) {
-          fileData.set(document.id, document)
-          document.name = document.title || document.id.split["/"].slice(document.id.split["/"].length-1).split(".")[0]
-          document.ext = document.id.split(".")[document.id.split(".").length-1]
-        }
-        console.log(documents)
-        this.setState({files: documents, fileData: fileData})
-      } 
+      let documents = await this.cm.getResearchPapers(webId);
+      if(!documents || documents.length === 0) {
+        this.setState({files: []})
+        return;
+      }
+      for (let document of documents) {
+        fileData.set(document.id, document)
+        document.name = document.id.split("/").slice(document.id.split("/").length-1)[0]
+        document.ext = document.id.split(".")[document.id.split(".").length-1]
+      }
+      console.log(documents)
+      this.fileData = fileData;
+      this.setState({files: documents})
     }
 
     handleSelectionChange = (selection) => {
-      // Workaround because the component allows for more that 1 file to be selected at a time
+      // Workaround because the component allows for more that 1 file to be` selected at a time
       if(Object.keys(selection).length > 1) {
         let keys = Object.keys(selection)
         for (let key of keys.slice(1)){
@@ -57,20 +79,40 @@ export default class DocumentsView extends React.Component {
       }
       const documentSelection = {}
       for (let documentId of Object.keys(selection)){
-        documentSelection[documentId] = this.state.fileData.get(documentId)
+        documentSelection[documentId] = this.fileData.get(documentId)
       }
       this.props.handleSelection(documentSelection)
     };
 
+    changeSearchId(e){
+      console.log("updating search id", e.target.value)
+      this.setState({searchId: e.target.value})
+    }
+
+   updateSearchId(){
+      this.asyncUpdate(this.state.searchId)
+    }
+
+    initializedCollection() {
+      this.asyncInit()
+    }
+    
     render() {
       const {files} = this.state;
+
+      console.log("RENDERING FILES", files)
+
+      if(!this.state.collection) {
+        return( <InitializePaperCollectionComponent cm={this.cm} initializedCollection={this.initializedCollection}/> )
+      }
 
       return (
         <div className="documentsviewcontainer disable-scrollbars">
           <FileBrowser ref={this.chonkyRef}
-            files={files} view={FileView.SmallThumbs}
+            files={files} view={FileView.SmallThumbs}initializedCollection
             onSelectionChange={this.handleSelectionChange}/>
-          <div className="refreshDivButton" onClick={() => {this.asyncUpdate()}}>Refresh</div>
+          <div className="refreshDivButton" onClick={() => {this.updateSearchId()}}> Go </div>
+          <input className="searchLocation" value={this.state.searchId} onChange={this.changeSearchId} />
         </div>
       )
     }

@@ -52,9 +52,15 @@ export default class CommunicationManager {
   async getDataStore(data: any, baseIRI: string): Promise < N3.N3Store | null > {
     if (!data) return null;
     const store = new N3.Store();
-    const parsed = await new N3.Parser({
-      baseIRI: baseIRI
-    }).parse(data);
+    let parsed : N3.Quad[];
+    try { 
+      parsed = await new N3.Parser({
+        baseIRI: baseIRI
+      }).parse(data);
+    } catch (e) {
+      console.error(e)
+      parsed = [];
+    }
     await store.addQuads(parsed);
     return store;
   }

@@ -1,5 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FileClient = require("solid-file-client");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const irc = require('@inrupt/solid-react-components');
+
 const ORIGIN = "http://localhost:8080";
 const DEFAULT_ACCEPT = "application/ld+json;q=0.9,text/turtle;q=0.8";
 
@@ -36,7 +39,22 @@ export class FileUtil {
 
   // Post file from string
   async postFile(fileURL: string, content: string, contentType: string) {
-    return await this.fc.postFile(fileURL, content, contentType);
+    const session = await this.auth.currentSession()
+    if(!session) {throw new Error("no session")}
+    const webId = session.webId;
+    if(!webId) {throw new Error("no webId")}
+    const post = await this.fc.postFile(fileURL, content, contentType);
+    // const permissions = [
+    //   {
+    //     agents: null,
+    //     modes: [irc.AccessControlList.MODES.READ, irc.AccessControlList.MODES.APPEND]
+    //   }
+    // ];
+    // console.log("CREATING ACL FILE", webId, fileURL)
+    // const ACLFile = new irc.AccessControlList(webId, fileURL);
+    // await ACLFile.createACL(permissions);
+
+    return post;
   }
 
   async postAndPatchFile(fileURL: string, content: string){

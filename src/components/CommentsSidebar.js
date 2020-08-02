@@ -7,7 +7,7 @@ import List from '@material-ui/core/List';
 import CommentAddComponent from './CommentAddComponent';
 
 import "./Sidebar.css"
-const REFRESHRATE=10000
+const REFRESHRATE=1000
 
 
 export default class CommentsSidebar extends React.Component {

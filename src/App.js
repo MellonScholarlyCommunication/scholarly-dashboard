@@ -14,10 +14,20 @@ export default class APP extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      webId: "",
       selection: [],
     };
     this.cm = new CommunicationManager(solid)
     this.handleSelection = this.handleSelection.bind(this);
+  }
+
+  componentDidMount(){
+    solid.trackSession(session => {
+      if (!session)
+        this.setState({webId: ""})
+      else
+        this.setState({webId: session.webId})
+    });
   }
 
   handleSelection(newSelection) {
@@ -32,6 +42,14 @@ export default class APP extends React.Component {
   }
 
   render(){
+    if(!this.state.webId){
+      return (
+        <div className="App">
+            <NavbarComponent className="navbar" cm={this.cm}/>
+            <p>Please login</p>
+        </div>
+      )
+    }
     return (
       <div className="App">
           <NavbarComponent className="navbar" cm={this.cm}/>

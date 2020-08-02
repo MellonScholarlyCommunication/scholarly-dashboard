@@ -42,10 +42,6 @@ export default class CommentAddComponent extends React.Component {
     return this.cm.getBaseIRI(webId) + "comments/"
   }
 
-  initializedCollection() {
-    this.update()
-  }
-
   async submit() {
     console.log("SUBMITTING", this.state.commentDir, this.comment, this.props)
     
