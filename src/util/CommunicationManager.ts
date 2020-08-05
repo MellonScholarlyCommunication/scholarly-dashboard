@@ -1,6 +1,7 @@
 import MetadataFileGenerator from "./MetadataFileGenerator";
 import { FileUtil } from "./FileUtil";
 import * as N3 from "n3"
+import PermissionManager from "./PermissionManager";
 
 const FOAF = "http://xmlns.com/foaf/0.1/";
 const DCTERMS = "http://purl.org/dc/terms/";
@@ -23,10 +24,12 @@ const DEFAULTCOMMENTSDIRECTORY = "comments/";
 export default class CommunicationManager {
                  fu: FileUtil;
                  auth: any;
+                 pm: PermissionManager;
                  constructor(auth: any) {
                    // eslint-disable-next-line @typescript-eslint/no-var-requires
                    this.fu = new FileUtil(auth);
                    this.auth = auth;
+                   this.pm = new PermissionManager(auth)
                  }
 
                  async loadProfile(
@@ -430,9 +433,11 @@ export default class CommunicationManager {
                      paperURI,
                      metadata
                    );
-                   return await this.fu.postAndPatchFile(metadataURI, content);
+                   const post = await this.fu.postAndPatchFile(metadataURI, content);
                    // this.fu.postFile(metadataURI, "", "text/turtle")
                    // this.fu.patchFile(metadataURI, content)
+                   this.pm.setReadForEveryone(metadataURI);
+                   return post
                  }
 
                  async addComment(

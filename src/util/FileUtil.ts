@@ -43,18 +43,7 @@ export class FileUtil {
     if(!session) {throw new Error("no session")}
     const webId = session.webId;
     if(!webId) {throw new Error("no webId")}
-    const post = await this.fc.postFile(fileURL, content, contentType);
-    // const permissions = [
-    //   {
-    //     agents: null,
-    //     modes: [irc.AccessControlList.MODES.READ, irc.AccessControlList.MODES.APPEND]
-    //   }
-    // ];
-    // console.log("CREATING ACL FILE", webId, fileURL)
-    // const ACLFile = new irc.AccessControlList(webId, fileURL);
-    // await ACLFile.createACL(permissions);
-
-    return post;
+    return await this.fc.postFile(fileURL, content, contentType);
   }
 
   async postAndPatchFile(fileURL: string, content: string){
