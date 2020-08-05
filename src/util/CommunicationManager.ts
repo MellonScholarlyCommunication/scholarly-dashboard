@@ -393,6 +393,15 @@ export default class CommunicationManager {
     if (fileUploadResponse.status === 201) {
       // The resource has succesfully been created
       const uploadURL = fileUploadResponse.url;
+      // The paper can be read by friends/contacts
+      // Current session should always be active since upload just succeeded
+      const session = await this.auth.currentSession();
+      if (!(session && session.webId)) {
+        throw new Error("No valid session or webId");
+      }
+      const contacts = await this.getContacts(session.webId);
+      console.log(contacts)
+      this.pm.setRead(uploadURL, contacts)
 
       let metadataURI: any = paperURI.split(".");
       metadataURI =
@@ -436,8 +445,12 @@ export default class CommunicationManager {
     const post = await this.fu.postAndPatchFile(metadataURI, content);
     // this.fu.postFile(metadataURI, "", "text/turtle")
     // this.fu.patchFile(metadataURI, content)
-    this.pm.setReadForEveryone(metadataURI);
-    return post
+    console.log(post);
+    if (post.ok) {
+      // Everyone can read the metadata file
+      this.pm.setRead(metadataURI);
+    }
+    return post.ok
   }
 
   async addComment(

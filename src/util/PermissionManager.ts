@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const irc = require('@inrupt/solid-react-components');
 
 export default class PermissionManager{
@@ -9,17 +8,18 @@ export default class PermissionManager{
   }
 
   /**
-   *  Set permission to read for everyone
+   * Set permission to read for certain people
    * @param docURI The document URI on which the permissions apply
+   * @param people A list of webID's, null for everyone
    */
-  async setReadForEveryone(docURI: string) {
+  async setRead(docURI: string, people: string[] | null = null) {
     const permissions = [
       {
-        agents: null,  // all agents
+        agents: people,  // if null: everyone
         modes: [irc.AccessControlList.MODES.READ]
       }
     ];
-    console.log("Setting READ access for everyone on", docURI);
+    console.log(`Setting READ access for ${people === null ? "everyone" : people} on`, docURI);
     await this.createACL(docURI, permissions);
   }
 
