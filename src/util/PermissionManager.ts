@@ -3,23 +3,23 @@ const irc = require('@inrupt/solid-react-components');
 const MODES = irc.AccessControlList.MODES
 export { MODES }; // MODES.READ, MODES.WRITE, MODES.APPEND, MODES.CONTROL
 
+/**
+ * Create a permission-object, to pass to createACL or addToACL
+ * @param modes A list of modes,
+ * @param people A list of webID's, null for everyone
+ */
+export function createPermission(modes: object[], people: string[] | null = null): object {
+  return {
+    agents: people,
+    modes: modes
+  };
+}
+
 export class PermissionManager{
   auth: any;
 
   constructor(auth: any) {
     this.auth = auth;
-  }
-
-  /**
-   * Create a permission-object, to pass to createACL or addToACL
-   * @param modes A list of modes,
-   * @param people A list of webID's, null for everyone
-   */
-  createPermission(modes: object[], people: string[] | null = null): object {
-    return {
-      agents: people,
-      modes: modes
-    }
   }
 
   /**
@@ -39,7 +39,6 @@ export class PermissionManager{
       docURI,
       docURI + '.acl'
     );
-    console.log(permissions)
     await ACL.createACL(permissions);
   }
 
@@ -59,6 +58,6 @@ export class PermissionManager{
       docURI,
       docURI + '.acl'
     );
-    await ACL.assignPermissions(permissions)
+    await ACL.assignPermissions(permissions);
   }
 }

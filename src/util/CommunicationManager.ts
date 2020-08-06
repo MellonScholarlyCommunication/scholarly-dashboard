@@ -1,7 +1,7 @@
 import MetadataFileGenerator from "./MetadataFileGenerator";
 import { FileUtil } from "./FileUtil";
 import * as N3 from "n3"
-import { MODES, PermissionManager } from "./PermissionManager";
+import { PermissionManager, createPermission, MODES } from "./PermissionManager";
 import SelectInput from "@material-ui/core/Select/SelectInput";
 
 const FOAF = "http://xmlns.com/foaf/0.1/";
@@ -403,7 +403,7 @@ export default class CommunicationManager {
       const contacts = await this.getContacts(session.webId);
       console.log("Setting READ for all contacts/friends");
       this.pm.createACL(uploadURL,
-        [this.pm.createPermission([MODES.READ], contacts)]
+        [createPermission([MODES.READ], contacts)]
       );
 
       let metadataURI: any = paperURI.split(".");
@@ -452,7 +452,7 @@ export default class CommunicationManager {
     if (post.ok) {
       // Everyone can read the metadata file
       this.pm.createACL(metadataURI,
-        [this.pm.createPermission([MODES.READ], null)] // null for everyone
+        [createPermission([MODES.READ], null)] // null for everyone
       );
     }
     return post.ok
