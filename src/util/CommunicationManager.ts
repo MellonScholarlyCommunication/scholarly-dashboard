@@ -1,7 +1,8 @@
 import MetadataFileGenerator from "./MetadataFileGenerator";
 import { FileUtil } from "./FileUtil";
 import * as N3 from "n3"
-import PermissionManager from "./PermissionManager";
+import { MODES, PermissionManager } from "./PermissionManager";
+import SelectInput from "@material-ui/core/Select/SelectInput";
 
 const FOAF = "http://xmlns.com/foaf/0.1/";
 const DCTERMS = "http://purl.org/dc/terms/";
@@ -400,8 +401,10 @@ export default class CommunicationManager {
         throw new Error("No valid session or webId");
       }
       const contacts = await this.getContacts(session.webId);
-      console.log(contacts)
-      this.pm.setRead(uploadURL, contacts)
+      console.log("Setting READ for all contacts/friends");
+      this.pm.createACL(uploadURL,
+        [this.pm.createPermission([MODES.READ], contacts)]
+      );
 
       let metadataURI: any = paperURI.split(".");
       metadataURI =
@@ -448,7 +451,9 @@ export default class CommunicationManager {
     console.log(post);
     if (post.ok) {
       // Everyone can read the metadata file
-      this.pm.setRead(metadataURI);
+      this.pm.createACL(metadataURI,
+        [this.pm.createPermission([MODES.READ], null)] // null for everyone
+      );
     }
     return post.ok
   }
