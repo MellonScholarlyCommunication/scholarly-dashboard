@@ -9,6 +9,7 @@ import CommunicationManager from 'util/CommunicationManager';
 import solid from 'solid-auth-client'
 import CommentAddComponent from 'components/CommentAddComponent';
 import { GivePermission } from 'components/GivePermission';
+import { AccessController } from 'components/AccessController';
 
 export default class APP extends React.Component {
 
@@ -41,7 +42,8 @@ export default class APP extends React.Component {
       return <NotificationsSideBar selection={this.state.selection} cm={this.cm}/>
     return (
       <div>
-        <GivePermission selection={this.state.selection} cm={this.cm} />
+        <AccessController selection={this.state.selection} cm={this.cm}/>
+        {/* <GivePermission selection={this.state.selection} cm={this.cm} /> */}
         <CommentsSidebar selection={this.state.selection} cm={this.cm} />
       </div>)
   }

@@ -7,7 +7,7 @@ import List from '@material-ui/core/List';
 import CommentAddComponent from './CommentAddComponent';
 
 import "./Sidebar.css"
-const REFRESHRATE=1000
+const REFRESHRATE=20000
 
 
 export default class CommentsSidebar extends React.Component {
@@ -61,14 +61,14 @@ export default class CommentsSidebar extends React.Component {
         console.log("newComment")
         return true;
       }
-    } 
+    }
     if(nextstate.commentDates.length !== this.state.commentDates.length) return true;
     for (let i = 0; i < nextstate.commentDates.length; i++) {
       if (nextstate.commentDates[i] !== this.state.commentDates[i]) {
         console.log("newDates")
         return true;
       }
-    } 
+    }
     console.log("nothing")
     return false;
   }
@@ -95,7 +95,7 @@ export default class CommentsSidebar extends React.Component {
     if(commentIds)
       this.setState({commentIds: commentIds});
     this.updaterunning = false;
-  }  
+  }
 
   getDateForId(id){
     let commentDates = this.state.commentDates

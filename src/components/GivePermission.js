@@ -1,3 +1,6 @@
+/*
+  NOT USED
+*/
 import React from 'react'
 import { createPermission, MODES } from '../util/PermissionManager'
 

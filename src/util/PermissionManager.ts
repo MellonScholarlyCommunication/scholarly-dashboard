@@ -22,6 +22,14 @@ export class PermissionManager{
     this.auth = auth;
   }
 
+  async checkSession() {
+    let session = await this.auth.currentSession();
+    if (!(session && session.webId)) {
+      throw new Error("No valid session or webId");
+    }
+    return session.webId;
+  }
+
   /**
    * Create an ACL file for a document
    *    default permissions for creator: Read, Write, Control
@@ -29,11 +37,7 @@ export class PermissionManager{
    * @param permissions Permissions, like created by `createPermission`
    */
   async createACL(docURI: string, permissions: object[]) {
-    let session = await this.auth.currentSession();
-    if (!(session && session.webId)) {
-      throw new Error("No valid session or webId");
-    }
-    const webId = session.webId;
+    const webId = this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
@@ -43,21 +47,44 @@ export class PermissionManager{
   }
 
   /**
+   * Dalete the ACL file for a document, then make a new one
+   *    default permissions for creator: Read, Write, Control
+   * @param docURI The document URI on which the permissions apply
+   * @param permissions Permissions, like created by `createPermission`
+   */
+  async reCreateACL(docURI: string, permissions: object[]) {
+    const webId = this.checkSession();
+    const ACL = new irc.AccessControlList(
+      webId,
+      docURI,
+      docURI + '.acl'
+    );
+    await ACL.deleteACL();
+    await ACL.createACL(permissions);
+  }
+
+  /**
    * Adds given permissions to the ACL file for a document
    * @param docURI The document URI on which the permissions apply
    * @param permissions Permissions, like created by `createPermission`
    */
   async addToACL(docURI: string, permissions: object[]) {
-    let session = await this.auth.currentSession();
-    if (!(session && session.webId)) {
-      throw new Error("No valid session or webId");
-    }
-    const webId = session.webId;
+    const webId = this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
       docURI + '.acl'
     );
     await ACL.assignPermissions(permissions);
+  }
+
+  async getPermissions(docURI: string) {
+    const webId = this.checkSession();
+    const ACL = new irc.AccessControlList(
+      webId,
+      docURI,
+      docURI + '.acl'
+    );
+    return ACL.getPermissions();
   }
 }

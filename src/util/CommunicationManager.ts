@@ -121,8 +121,15 @@ export default class CommunicationManager {
     return names[0].object.id;
   }
 
-  async getContacts(webId: string) {
-    let datastore = await this.getDataStoreFromFile(webId);
+  async getContacts(webId: string | null = null) {
+    if (webId === null) {  // webId === null => webId of user logged in
+      let session = await this.auth.currentSession();
+      if (!(session && session.webId)) {
+        throw new Error("No valid session or webId");
+      }
+      webId = session.webId;
+    }
+    let datastore = await this.getDataStoreFromFile(webId!);
     if (!datastore) return null;
     return this.getFriendsFromStore(datastore);
   }
@@ -396,11 +403,7 @@ export default class CommunicationManager {
       const uploadURL = fileUploadResponse.url;
       // The paper can be read by friends/contacts
       // Current session should always be active since upload just succeeded
-      const session = await this.auth.currentSession();
-      if (!(session && session.webId)) {
-        throw new Error("No valid session or webId");
-      }
-      const contacts = await this.getContacts(session.webId);
+      const contacts = await this.getContacts();
       console.log("Setting READ for all contacts/friends");
       this.pm.createACL(uploadURL,
         [createPermission([MODES.READ], contacts)]
