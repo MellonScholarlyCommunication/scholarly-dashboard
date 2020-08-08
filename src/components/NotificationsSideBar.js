@@ -7,7 +7,7 @@ import AsyncListItemNotification from "./AsyncListItemNotification"
 import List from '@material-ui/core/List';
 import "./Sidebar.css"
 import { UploadFileComponent } from './UploadFileComponent';
-const REFRESHRATE = 1000
+const REFRESHRATE = 20000
 
 export default class NotificationsSideBar extends React.Component {
 
@@ -20,9 +20,9 @@ export default class NotificationsSideBar extends React.Component {
     this.running = false
     this.timeout = null;
   }
-  
+
   componentDidMount() {
-    this.timeout = setInterval(this.update, REFRESHRATE); 
+    this.timeout = setInterval(this.update, REFRESHRATE);
     this.running = true
     this.update();
   }
@@ -39,7 +39,7 @@ export default class NotificationsSideBar extends React.Component {
       if (oldnotifs[i] !== newnotifs[i]) {
         return true;
       }
-    } 
+    }
     return false;
   }
 
@@ -48,7 +48,7 @@ export default class NotificationsSideBar extends React.Component {
     const session = await solid.currentSession()
     const webId = session.webId
     if(!webId) return;
-    
+
     const inbox = await this.nh.discoverInboxUri(webId);
     if (!inbox) throw new Error("InboxViewContainer not correctly initialized");
     console.log("INBOX", inbox);

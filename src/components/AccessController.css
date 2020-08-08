@@ -1,0 +1,22 @@
+.access-control-list {
+	max-height: 300px;
+	overflow: scroll;
+}
+
+/* TODO: Fix css
+/* .access-control-row {
+	width: auto;
+	position: relative;
+}
+
+.access-control-name {
+	display: block;
+	width: 50%;
+	position: relative;
+}
+
+.access-control-checkbox {
+	display: block;
+	float: right;
+	position: relative;
+} */
