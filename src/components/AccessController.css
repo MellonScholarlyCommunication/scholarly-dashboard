@@ -1,22 +1,14 @@
-.access-control-list {
+.access-control-table {
 	max-height: 300px;
 	overflow: scroll;
 }
 
-/* TODO: Fix css
-/* .access-control-row {
-	width: auto;
-	position: relative;
+.access-control-table td {
+	border-right: 1px solid black;
 }
 
-.access-control-name {
-	display: block;
-	width: 50%;
-	position: relative;
-}
 
-.access-control-checkbox {
-	display: block;
-	float: right;
-	position: relative;
-} */
+.access-control-table th {
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}

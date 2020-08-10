@@ -115,27 +115,37 @@ export class AccessController extends React.Component {
   render() {
     let list = Object.entries(this.state.agentsToPermissions)
       .map(([agent, permissions]) => (
-          <li className="access-control-row" key={agent} >
-            <input className="access-control-name" type="text" value={agent === "null" ? "Everyone" : agent} readOnly />
-						<input type="checkbox" className="access-control-checkbox" onChange={this.handleChange}
-							value={`${agent} ${MODES.READ}`}
-							defaultChecked={permissions.has(MODES.READ)} />
-						<input type="checkbox" className="access-control-checkbox" onChange={this.handleChange}
-							value={`${agent} ${MODES.WRITE}`}
-							defaultChecked={permissions.has(MODES.WRITE)} />
-						<input type="checkbox" className="access-control-checkbox" onChange={this.handleChange}
-							value={`${agent} ${MODES.CONTROL}`}
-							defaultChecked={permissions.has(MODES.CONTROL)} />
-          </li>
+				<tr>
+					<td><input type="text" value={agent === "null" ? "Everyone" : agent} readOnly /></td>
+					<td><input type="checkbox" onChange={this.handleChange}
+						value={`${agent} ${MODES.READ}`}
+						defaultChecked={permissions.has(MODES.READ)} /></td>
+					<td><input type="checkbox" onChange={this.handleChange}
+						value={`${agent} ${MODES.WRITE}`}
+						defaultChecked={permissions.has(MODES.WRITE)} /></td>
+					<td><input type="checkbox" onChange={this.handleChange}
+						value={`${agent} ${MODES.COMMENT}`}
+						defaultChecked={permissions.has(MODES.COMMENT)} /></td>
+					<td><input type="checkbox" onChange={this.handleChange}
+						value={`${agent} ${MODES.CONTROL}`}
+						defaultChecked={permissions.has(MODES.CONTROL)} /></td>
+				</tr>
         )
       );
 
     return (
       <form>
         <p>Permissions for this file</p>
-        <ul className="access-control-list">
+        <table className="access-control-table">
+					<tr>
+						<th>Person</th>
+						<th>Read</th>
+						<th>Write</th>
+						<th>Comment</th>
+						<th>Control</th>
+					</tr>
           {list}
-        </ul>
+        </table>
 				<input type="submit" value="Save permissions" />
       </form>
     )

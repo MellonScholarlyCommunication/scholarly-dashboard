@@ -1,6 +1,7 @@
 const irc = require('@inrupt/solid-react-components');
 // Use the Read, Write, Append and Control modes from solid-react-components
 const MODES = irc.AccessControlList.MODES
+MODES.COMMENT = "Comment"
 export { MODES }; // MODES.READ, MODES.WRITE, MODES.APPEND, MODES.CONTROL
 
 /**
