@@ -54,12 +54,14 @@ export class PermissionManager{
    * @param permissions Permissions, like created by `createPermission`
    */
   async reCreateACL(docURI: string, permissions: object[]) {
-    const webId = this.checkSession();
+    const webId = await this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
       docURI + '.acl'
     );
+    // If the file inherits it's ACL from a parent container, this will generate a 404
+    // Aside from the error in the console, this is wanted behaviour though
     await ACL.deleteACL();
     await ACL.createACL(permissions);
   }
@@ -77,6 +79,16 @@ export class PermissionManager{
       docURI + '.acl'
     );
     await ACL.assignPermissions(permissions);
+  }
+
+  async deleteACL(docURI: string) {
+    const webId = this.checkSession();
+    const ACL = new irc.AccessControlList(
+      webId,
+      docURI,
+      docURI + '.acl'
+    );
+    await ACL.deleteACL();
   }
 
   async getPermissions(docURI: string) {

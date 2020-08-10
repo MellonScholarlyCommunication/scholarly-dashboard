@@ -20,6 +20,7 @@ export class AccessController extends React.Component {
       contacts,
       permissions,
 			agentsToPermissions: {},
+			permissionsChanged: false,
 			notifications: new Set()  // notification to all contacts
 		};
 
@@ -36,7 +37,8 @@ export class AccessController extends React.Component {
 			contacts,
 			permissions,
 			agentsToPermissions: this.calculateAgentsToPermissions(permissions, contacts),
-			notifications: new Set(contacts)
+			notifications: new Set(contacts),
+			permissionsChanged: false
 		});
 	}
 
@@ -46,14 +48,17 @@ export class AccessController extends React.Component {
 		if (Object.keys(prevProps.selection)[0] !== documentURI) {
 			let contacts = await this.cm.getContacts();
 			let permissions = await this.cm.pm.getPermissions(documentURI);
+			console.log(permissions)
+			console.log(documentURI)
 
 			this.setState({
 				documentURI,
 				contacts,
 				permissions,
 				agentsToPermissions: this.calculateAgentsToPermissions(permissions, contacts),
-				notifications: new Set(contacts)
-			});
+				notifications: new Set(contacts),
+				permissionsChanged: false
+			}, () => { console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"); console.dir(this.state) });
 		}
 	}
 
@@ -78,7 +83,7 @@ export class AccessController extends React.Component {
       if (!agentsToPermissions[contact]) {
         agentsToPermissions[contact] = new Set();
       }
-    }
+		}
     return agentsToPermissions;
 	}
 
@@ -88,65 +93,113 @@ export class AccessController extends React.Component {
 		let value = event.target.value.split(" ");
 		let mode = value.pop();
 		let agent = value.join(' ');
-		this.setState(oldState => {
-				if (isChecked) {
-					oldState.agentsToPermissions[agent].add(mode);
-				} else {
-					oldState.agentsToPermissions[agent].delete(mode);
-				}
-				return oldState;
+		this.setState(state => {
+			if (isChecked) {
+				state.agentsToPermissions[agent].add(mode);
+			} else {
+				state.agentsToPermissions[agent].delete(mode);
+			}
+			state.permissionsChanged = true;
+			return state;
 		})
 	}
 
-	// TODO: still buggy
 	handleSubmit(event) {
 		event.preventDefault();
-		let permissions = []
-		Object.keys(this.state.agentsToPermissions)
+		if (!this.state.permissionsChanged) {
+			return;
+		}
+		let permissions = [];
+		// Comment is APPEND permission on metafile.
+		let commentPermissions = [{ agents: [], modes: [MODES.APPEND] }];
+		Object.entries(this.state.agentsToPermissions)
 			.map(([agent, modes]) => {
-				permissions.push({
-					agents: [agent],
-					modes: permissions
-				});
+				if (modes.delete(MODES.COMMENT)) {
+					if (agent === "null") {  // Special case for Everyone
+						commentPermissions.push({ agents: null, modes: [MODES.APPEND]});
+					} else {
+						commentPermissions[0].agents.push(agent)  // Add this agent to the APPEND mode
+					}
+				}
+				// If there is something checked
+				if (modes.size) {
+					modes = [...modes].sort();
+					let assigned = false;
+					if (agent === "null") {  // Special case for Everyone
+						permissions.push({ agents: null, modes: modes});
+						return;
+					}
+					for (let permission of permissions) {
+						if (permission.modes.join('') === modes.join('') && permission.agents !== null) {
+							permission.agents.push(agent);
+							assigned = true;
+						}
+					}
+					if (!assigned) {
+						permissions.push({
+							agents: [agent],
+							modes: [...modes].sort()
+						});
+					}
+				}
 			});
-		this.cm.pm.reCreateAcl(this.state.documentURI, permissions);
+		if (!permissions) {
+			this.cm.pm.deleteACL(this.state.documentURI);
+			alert("No one is assigned permission, but you will still have it.");
+		} else {
+			this.cm.pm.reCreateACL(this.state.documentURI, permissions);
+		}
+		if (commentPermissions.length === 1 && !commentPermissions[0].agents.length) {  // Complicated check because list is initialized with object
+			// This might delete too much
+			this.cm.pm.deleteACL(this.cm.getMetadataURI(this.state.documentURI));
+			alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
+		} else {
+			this.cm.pm.reCreateACL(this.cm.getMetadataURI(this.state.documentURI), commentPermissions);
+			alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
+		}
+		this.setState({ permissionsChanged: false })
 	}
 
   render() {
-    let list = Object.entries(this.state.agentsToPermissions)
+		console.log(Object.entries(this.state.agentsToPermissions))
+    let tableData = Object.entries(this.state.agentsToPermissions)
       .map(([agent, permissions]) => (
-				<tr>
+				<tr key={agent}>
 					<td><input type="text" value={agent === "null" ? "Everyone" : agent} readOnly /></td>
 					<td><input type="checkbox" onChange={this.handleChange}
 						value={`${agent} ${MODES.READ}`}
-						defaultChecked={permissions.has(MODES.READ)} /></td>
+						checked={permissions.has(MODES.READ)} /></td>
 					<td><input type="checkbox" onChange={this.handleChange}
 						value={`${agent} ${MODES.WRITE}`}
-						defaultChecked={permissions.has(MODES.WRITE)} /></td>
+						checked={permissions.has(MODES.WRITE)} /></td>
 					<td><input type="checkbox" onChange={this.handleChange}
 						value={`${agent} ${MODES.COMMENT}`}
-						defaultChecked={permissions.has(MODES.COMMENT)} /></td>
+						checked={permissions.has(MODES.COMMENT)} /></td>
 					<td><input type="checkbox" onChange={this.handleChange}
 						value={`${agent} ${MODES.CONTROL}`}
-						defaultChecked={permissions.has(MODES.CONTROL)} /></td>
+						checked={permissions.has(MODES.CONTROL)} /></td>
 				</tr>
         )
       );
 
     return (
-      <form>
+      <form onSubmit={this.handleSubmit}>
         <p>Permissions for this file</p>
         <table className="access-control-table">
-					<tr>
-						<th>Person</th>
-						<th>Read</th>
-						<th>Write</th>
-						<th>Comment</th>
-						<th>Control</th>
-					</tr>
-          {list}
+					<thead>
+						<tr>
+							<th>Person</th>
+							<th>Read</th>
+							<th>Write</th>
+							<th>Comment</th>
+							<th>Control</th>
+						</tr>
+					</thead>
+					<tbody>
+          	{tableData}
+					</tbody>
         </table>
-				<input type="submit" value="Save permissions" />
+				<input type="submit" value="Save permissions" disabled={!this.state.permissionsChanged} />
       </form>
     )
   }

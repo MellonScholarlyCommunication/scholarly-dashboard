@@ -409,11 +409,7 @@ export default class CommunicationManager {
         [createPermission([MODES.READ], contacts)]
       );
 
-      let metadataURI: any = paperURI.split(".");
-      metadataURI =
-        metadataURI
-          .slice(0, Math.max(1, metadataURI.length - 1))
-          .join(".") + "_meta.ttl";
+      let metadataURI: string = this.getMetadataURI(paperURI);
       metadata.metadatalocation = metadataURI;
       const metadataPatch = MetadataFileGenerator.generatePaperEntry(
         collection.collectionid,
@@ -435,6 +431,13 @@ export default class CommunicationManager {
       throw new Error("Paper not uploaded succesfully");
     }
     return fileUploadResponse;
+  }
+
+  getMetadataURI(fileURI: string) {
+    let metadataURI: any = fileURI.split(".");
+    return metadataURI
+          .slice(0, Math.max(1, metadataURI.length - 1))
+          .join(".") + "_meta.ttl";
   }
 
   async createMetadataFile(
@@ -491,7 +494,7 @@ export default class CommunicationManager {
 
     const metadataLocation =
       paperMetadata.metadatalocation ||
-      paperMetadata.id + ".meta";
+      this.getMetadataURI(paperMetadata.id)
     const patchMetadata = "INSERT {" + comment.metadata + "}";
     try {
       this.fu.patchFile(metadataLocation, patchMetadata);
