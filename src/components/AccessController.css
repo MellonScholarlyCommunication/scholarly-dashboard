@@ -1,6 +1,7 @@
 .access-control-table {
 	max-height: 300px;
 	overflow: scroll;
+	width: 100%;
 }
 
 .access-control-table td {

@@ -451,17 +451,9 @@ export default class CommunicationManager {
       paperURI,
       metadata
     );
-    const post = await this.fu.postAndPatchFile(metadataURI, content);
     // this.fu.postFile(metadataURI, "", "text/turtle")
     // this.fu.patchFile(metadataURI, content)
-    console.log(post);
-    if (post.ok) {
-      // Everyone can read the metadata file
-      this.pm.createACL(metadataURI,
-        [createPermission([MODES.READ], null)] // null for everyone
-      );
-    }
-    return post.ok
+    return (await this.fu.postAndPatchFile(metadataURI, content)).ok;
   }
 
   async addComment(

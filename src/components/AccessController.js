@@ -7,7 +7,7 @@ import "./AccessController.css"
 export class AccessController extends React.Component {
 
   constructor(props) {
-		super(props)
+		super(props);
 
 		this.cm = props.cm;
 		let documentURI = Object.keys(props.selection)[0];
@@ -21,6 +21,7 @@ export class AccessController extends React.Component {
       permissions,
 			agentsToPermissions: {},
 			permissionsChanged: false,
+			commentPermissionsChanged: false,
 			notifications: new Set()  // notification to all contacts
 		};
 
@@ -38,7 +39,8 @@ export class AccessController extends React.Component {
 			permissions,
 			agentsToPermissions: this.calculateAgentsToPermissions(permissions, contacts),
 			notifications: new Set(contacts),
-			permissionsChanged: false
+			permissionsChanged: false,
+			commentPermissionsChanged: false,
 		});
 	}
 
@@ -48,8 +50,6 @@ export class AccessController extends React.Component {
 		if (Object.keys(prevProps.selection)[0] !== documentURI) {
 			let contacts = await this.cm.getContacts();
 			let permissions = await this.cm.pm.getPermissions(documentURI);
-			console.log(permissions)
-			console.log(documentURI)
 
 			this.setState({
 				documentURI,
@@ -57,8 +57,9 @@ export class AccessController extends React.Component {
 				permissions,
 				agentsToPermissions: this.calculateAgentsToPermissions(permissions, contacts),
 				notifications: new Set(contacts),
-				permissionsChanged: false
-			}, () => { console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"); console.dir(this.state) });
+				permissionsChanged: false,
+				commentPermissionsChanged: false,
+			});
 		}
 	}
 
@@ -99,14 +100,18 @@ export class AccessController extends React.Component {
 			} else {
 				state.agentsToPermissions[agent].delete(mode);
 			}
-			state.permissionsChanged = true;
+			if (mode === MODES.COMMENT) {
+				state.commentPermissionsChanged = true;
+			} else {
+				state.permissionsChanged = true;
+			}
 			return state;
 		})
 	}
 
 	handleSubmit(event) {
 		event.preventDefault();
-		if (!this.state.permissionsChanged) {
+		if (!(this.state.permissionsChanged || this.state.commentPermissionsChanged)) {
 			return;
 		}
 		let permissions = [];
@@ -118,7 +123,7 @@ export class AccessController extends React.Component {
 					if (agent === "null") {  // Special case for Everyone
 						commentPermissions.push({ agents: null, modes: [MODES.APPEND]});
 					} else {
-						commentPermissions[0].agents.push(agent)  // Add this agent to the APPEND mode
+						commentPermissions[0].agents.push(agent);  // Add this agent to the APPEND mode
 					}
 				}
 				// If there is something checked
@@ -143,25 +148,28 @@ export class AccessController extends React.Component {
 					}
 				}
 			});
-		if (!permissions) {
-			this.cm.pm.deleteACL(this.state.documentURI);
-			alert("No one is assigned permission, but you will still have it.");
-		} else {
-			this.cm.pm.reCreateACL(this.state.documentURI, permissions);
+		if (this.state.permissionsChanged) {
+			if (!permissions) {
+				this.cm.pm.deleteACL(this.state.documentURI);
+				alert("No one is assigned permission, but you will still have it.");
+			} else {
+				this.cm.pm.reCreateACL(this.state.documentURI, permissions);
+			}
 		}
-		if (commentPermissions.length === 1 && !commentPermissions[0].agents.length) {  // Complicated check because list is initialized with object
-			// This might delete too much
-			this.cm.pm.deleteACL(this.cm.getMetadataURI(this.state.documentURI));
-			alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
-		} else {
-			this.cm.pm.reCreateACL(this.cm.getMetadataURI(this.state.documentURI), commentPermissions);
-			alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
+		if (this.state.commentPermissionsChanged) {
+			if (commentPermissions.length === 1 && !commentPermissions[0].agents.length) {  // Complicated check because list is initialized with object
+				// This might delete too much
+				this.cm.pm.deleteACL(this.cm.getMetadataURI(this.state.documentURI));
+				alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
+			} else {
+				this.cm.pm.reCreateACL(this.cm.getMetadataURI(this.state.documentURI), commentPermissions);
+				alert("Changing the 'comment' permission deletes the whole ACL file for the metadata file");
+			}
 		}
-		this.setState({ permissionsChanged: false })
+		this.setState({ permissionsChanged: false, commentPermissionsChanged: false });
 	}
 
   render() {
-		console.log(Object.entries(this.state.agentsToPermissions))
     let tableData = Object.entries(this.state.agentsToPermissions)
       .map(([agent, permissions]) => (
 				<tr key={agent}>
@@ -199,8 +207,9 @@ export class AccessController extends React.Component {
           	{tableData}
 					</tbody>
         </table>
-				<input type="submit" value="Save permissions" disabled={!this.state.permissionsChanged} />
+				<input type="submit" value="Save permissions"
+					disabled={!(this.state.permissionsChanged || this.state.commentPermissionsChanged)} />
       </form>
-    )
+    );
   }
 }
