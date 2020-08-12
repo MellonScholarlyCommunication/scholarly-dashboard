@@ -70,11 +70,14 @@ export default function AccessControlTable({ tableData, submitValues }) {
 	const [data, setData] = React.useState(tableData)
 
 	React.useEffect(
-		() => {
-			setData(tableData)
-		},
+		() => setData(tableData),
 		[tableData]
 	)
+
+	const addRow = () => {
+		data.push({ agent: '', read: false, write: false, comment: false, control: false });
+		setData([...data]);
+	}
 
 	const updateMyData = (rowIndex, columnId, value) => {
 		setData(old =>
@@ -131,7 +134,10 @@ export default function AccessControlTable({ tableData, submitValues }) {
 					})}
 				</tbody>
 			</table>
-			<button onClick={() => submitValues(data)}>Save permissions</button>
+			<>
+				<button onClick={addRow}>Add new</button>
+				<button onClick={() => submitValues(data)}>Save permissions</button>
+			</>
 		</>
 	)
 }

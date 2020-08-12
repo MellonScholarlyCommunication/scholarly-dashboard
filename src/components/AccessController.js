@@ -42,20 +42,22 @@ export class AccessController extends React.Component {
 	async fetchData(documentURI) {
 		let contacts = await this.cm.getContacts();
 		let permissions = await this.cm.pm.getPermissions(documentURI);
-		let tableData = this.createTableData(permissions, contacts);
+		let commentPermissions = await this.cm.pm.getPermissions(this.cm.getMetadataURI(documentURI));
+		let tableData = this.createTableData(permissions, commentPermissions, contacts);
 
 		this.setState(state => {
 			return {
 				documentURI,
 				contacts,
 				permissions,
+				commentPermissions,
 				tableData,
 				key: state.key+1
 			}
 		});
 	}
 
-  createTableData(permissions, contacts) {
+  createTableData(permissions, commentPermissions, contacts) {
 		let tableData = []
 		let agentIndexes = {}
 		let newRow = {
@@ -64,7 +66,7 @@ export class AccessController extends React.Component {
 			comment: false,
 			control: false
 		}
-    for (let permission of permissions) {
+		function processPermission(permission) {
 			if (permission.agents === null) {
 				permission.agents = [null];
 			}
@@ -83,7 +85,17 @@ export class AccessController extends React.Component {
 					tableData[index][mode.toLowerCase()] = true;
 				}
 			}
-    }
+		}
+    for (let permission of permissions) {
+			processPermission(permission)
+		}
+		// comment permissions
+		for (let permission of commentPermissions) {
+			if (permission.modes.includes(MODES.APPEND) || permission.modes.includes(MODES.WRITE)) {
+				permission.modes = [MODES.COMMENT];
+				processPermission(permission);
+			}
+		}
     // Contacs that don't have permission should also be displayed
     for (let contact of contacts) {
 			if (agentIndexes[contact] === undefined) {
@@ -125,7 +137,7 @@ export class AccessController extends React.Component {
 
 		for (let row of this.state.tableData) {  // 'row' is like { agent: 'bob', read: true, write: false ... }
 			if (row.comment) {
-				commentPermissions = addPermission(commentPermissions, row.agent, [MODES.COMMENT]);
+				commentPermissions = addPermission(commentPermissions, row.agent, [MODES.APPEND]);  // comment is APPEND on metadata file
 			}
 			let modes = [];
 			for (let [mode, access] of [[MODES.READ, row.read], [MODES.WRITE, row.write], [MODES.CONTROL, row.control]]) {
