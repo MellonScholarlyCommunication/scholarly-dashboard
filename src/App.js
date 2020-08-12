@@ -41,7 +41,7 @@ export default class APP extends React.Component {
       return <NotificationsSideBar selection={this.state.selection} cm={this.cm}/>
     return (
       <div>
-        <AccessController selection={this.state.selection} cm={this.cm}/>
+        <AccessController selection={this.state.selection} cm={this.cm} upload={false}/>
         <CommentsSidebar selection={this.state.selection} cm={this.cm} />
       </div>)
   }
