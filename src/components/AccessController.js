@@ -90,65 +90,60 @@ export class AccessController extends React.Component {
 				agentIndexes[contact] = tableData.length;
 				tableData.push({
 					...newRow,
-					contact
+					agent: contact
 				});
 		  }
 		}
     return tableData;
 	}
 
-	submitValues(rows) {
+	// TODO: check valid webId's, groups, weird permissions (only write, owner no control, ...)
+	submitValues() {
 		let permissions = [];
 		// Comment is APPEND permission on metafile.
-		let commentPermissions = [{ agents: [], modes: [MODES.APPEND] }];
-		for (let row of rows) {
-			let values = row.values;  // like { agent: 'bob', read: true, write: false ... }
-			let agent = values.agent;
-			if (values.comment) {
-				if (agent === null) {  // Special case for Everyone
-					commentPermissions.push({ agents: null, modes: [MODES.APPEND]});
-				} else {
-					commentPermissions[0].agents.push(agent);  // Add this agent to the APPEND mode
-				}
-			}
-			let modes = [];
-			for (let [mode, access] of [[MODES.READ, values.read], [MODES.WRITE, values.write], [MODES.CONTROL, values.control]]) {
-				if (access) { modes.push(mode) };
-			}
+		let commentPermissions = [];
+
+		function addPermission(permissions, agent, modes) {
+			if (!modes.length) { return permissions; }
 			modes.sort()
-			let assigned = false;
-			if (agent === null) {  // Special case for Everyone
-				permissions.push({ agents: null, modes: modes });
-				return;
+			// Always add new if the mode is for everyone
+			if (agent === null) {
+				permissions.push({ agents: null, modes: modes});
+				return permissions;
 			}
-			// If the same combination of modes already exists, add agent to that
 			for (let permission of permissions) {
+				// Assumes permission.modes is sorted
 				if (permission.modes.join('') === modes.join('') && permission.agents !== null) {
 					permission.agents.push(agent);
-					assigned = true;
+					return permissions;
 				}
 			}
-			if (!assigned) {
-				permissions.push({
-					agents: [agent],
-					modes: modes
-				});
-			}
+			// Mode does not yet exist
+			permissions.push({ agents: [agent], modes: modes });
+			return permissions;
 		}
-		console.log(permissions)
-		console.log(commentPermissions)
-		// this.cm.pm.reCreateACL(this.state.documentURI, permissions);
-		// this.cm.pm.reCreateACL(this.cm.getMetadataURI(this.state.documentURI), commentPermissions);
+
+		for (let row of this.state.tableData) {  // 'row' is like { agent: 'bob', read: true, write: false ... }
+			if (row.comment) {
+				commentPermissions = addPermission(commentPermissions, row.agent, [MODES.COMMENT]);
+			}
+			let modes = [];
+			for (let [mode, access] of [[MODES.READ, row.read], [MODES.WRITE, row.write], [MODES.CONTROL, row.control]]) {
+				if (access) { modes.push(mode); }
+			}
+			permissions = addPermission(permissions, row.agent, modes);
+		}
+
+		this.cm.pm.reCreateACL(this.state.documentURI, permissions);
+		this.cm.pm.reCreateACL(this.cm.getMetadataURI(this.state.documentURI), commentPermissions);
 	}
 
 	render() {
     return (
 			<>
         <p>Permissions for this file</p>
-				{<AccessControlTable tableData={this.state.tableData} setTableData={tableData =>
-					{ console.log(tableData)
-						this.setState({ tableData }) }
-						} />}
+				<AccessControlTable tableData={this.state.tableData}
+					submitValues={data => this.setState({ tableData: data }, this.submitValues)} />
       </>
     );
   }

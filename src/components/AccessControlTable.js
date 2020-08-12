@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useDebugValue } from 'react'
 import { useTable } from 'react-table'
 
 /*
@@ -20,20 +20,23 @@ const EditableCell = ({
 	}, [initialValue]);
 
 	if (id !== 'agent') {
+		// CHECKBOX
 		const onChecked = e => {
 			setValue(e.target.checked);
 			updateMyData(index, id, e.target.checked);
 		}
 		return <input type="checkbox" value={value} onChange={onChecked} checked={value} />;
 	} else {
+		// TEXT FIELD
 		const onChange = e => {
 			setValue(e.target.value);
 		}
 		// We'll only update the external data when the input is blurred
 		const onBlur = () => {
-			updateMyData(index, id, value);
+			let t_value = value.trim();
+			updateMyData(index, id, t_value.toLowerCase() === "everyone" ? null : t_value);
 		}
-		return <input value={value} onChange={onChange} onBlur={onBlur} />;
+		return <input value={value === null ? "Everyone" : value} onChange={onChange} onBlur={onBlur} />;
 	}
 }
 
@@ -68,8 +71,6 @@ export default function AccessControlTable({ tableData, submitValues }) {
 
 	React.useEffect(
 		() => {
-			console.log("DATACHANGE")
-			console.log(tableData)
 			setData(tableData)
 		},
 		[tableData]
@@ -130,7 +131,7 @@ export default function AccessControlTable({ tableData, submitValues }) {
 					})}
 				</tbody>
 			</table>
-			<button onClick={() => submitValues(rows)}>Save permissions</button>
+			<button onClick={() => submitValues(data)}>Save permissions</button>
 		</>
 	)
 }
