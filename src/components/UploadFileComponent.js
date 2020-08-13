@@ -5,6 +5,7 @@ import ContactSelector from "./ContactSelector"
 import CommunicationManager from '../util/CommunicationManager';
 import NotificationHandler from "../util/NotificationHandler";
 import MetadataFileGenerator from "../util/MetadataFileGenerator"
+import { MODES, createPermission } from '../util/PermissionManager'
 
 export class UploadFileComponent extends React.Component
 {
@@ -37,8 +38,9 @@ export class UploadFileComponent extends React.Component
     this.setState({contacts: contacts, storageLocation: this.cm.getBaseIRI(webId) + "papers/"})
   }
 
+  // This only gets called after a paper was submitted. contacts and storagelocation should not be reset.
   getNewState(){
-    return {file: null, contacts: [], uploading: false, storageLocation: this.state.storageLocation || ""}
+    return {file: null, contacts: this.state.contacts || [], uploading: false, storageLocation: this.state.storageLocation || ""}
   }
 
   handleChange(selectedFiles) {
@@ -91,9 +93,13 @@ export class UploadFileComponent extends React.Component
     let inboxes = [];
     for (let contact of contacts) {
       if (contact && validURL(contact)) {
-        inboxes.push(
-          (await this.nh.discoverInboxUri(contact)) || contact
-        );
+        try {
+          inboxes.push(
+            (await this.nh.discoverInboxUri(contact)) || contact
+          );
+        } catch (e) {
+          console.log(e);
+        }
       }
     }
 
@@ -107,10 +113,18 @@ export class UploadFileComponent extends React.Component
       console.log("inbox", inbox, "notified with result", result);
     }
 
+    // Notified people can read the paper
+    console.log("Setting READ for all selected contacts");
+    this.cm.pm.createACL(paperURI,
+      [createPermission([MODES.READ], contacts)]
+    );
+
     // create notification
     // this.props.paperAdded && this.props.paperAdded(paperMetadata);
     // reset component
     this.setState(this.getNewState())
+    // Notify that a file has been uploaded
+    this.props.fileUploaded()
   }
 
   render () {

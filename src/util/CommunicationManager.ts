@@ -401,13 +401,6 @@ export default class CommunicationManager {
     if (fileUploadResponse.status === 201) {
       // The resource has succesfully been created
       const uploadURL = fileUploadResponse.url;
-      // The paper can be read by friends/contacts
-      // Current session should always be active since upload just succeeded
-      const contacts = await this.getContacts();
-      console.log("Setting READ for all contacts/friends");
-      this.pm.createACL(uploadURL,
-        [createPermission([MODES.READ], contacts)]
-      );
 
       let metadataURI: string = this.getMetadataURI(paperURI);
       metadata.metadatalocation = metadataURI;

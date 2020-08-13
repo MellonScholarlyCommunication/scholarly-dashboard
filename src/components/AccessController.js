@@ -14,13 +14,12 @@ export class AccessController extends React.Component {
 
 		this.cm = props.cm || new CommunicationManager(solid);
 		let documentURI = Object.keys(props.selection)[0];
-		let contacts = [];
-		let permissions = [];
 
     this.state = {
 			documentURI,
-      contacts,
-      permissions,
+      contacts: [],
+			permissions: [],
+			commentPermissions: [],
 			tableData: [],
 			key: 0
 		};

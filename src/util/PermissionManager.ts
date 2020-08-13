@@ -38,12 +38,13 @@ export class PermissionManager{
    * @param permissions Permissions, like created by `createPermission`
    */
   async createACL(docURI: string, permissions: object[]) {
-    const webId = this.checkSession();
+    const webId = await this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
       docURI + '.acl'
     );
+    console.log(permissions)
     await ACL.createACL(permissions);
   }
 
@@ -72,7 +73,7 @@ export class PermissionManager{
    * @param permissions Permissions, like created by `createPermission`
    */
   async addToACL(docURI: string, permissions: object[]) {
-    const webId = this.checkSession();
+    const webId = await this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
@@ -82,7 +83,7 @@ export class PermissionManager{
   }
 
   async deleteACL(docURI: string) {
-    const webId = this.checkSession();
+    const webId = await this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
@@ -92,7 +93,7 @@ export class PermissionManager{
   }
 
   async getPermissions(docURI: string) {
-    const webId = this.checkSession();
+    const webId = await this.checkSession();
     const ACL = new irc.AccessControlList(
       webId,
       docURI,
