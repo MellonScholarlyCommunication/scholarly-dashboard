@@ -20,8 +20,7 @@ export class AccessController extends React.Component {
       contacts: [],
 			permissions: [],
 			commentPermissions: [],
-			tableData: [],
-			key: 0
+			tableData: []
 		};
 	}
 
@@ -50,8 +49,7 @@ export class AccessController extends React.Component {
 				contacts,
 				permissions,
 				commentPermissions,
-				tableData,
-				key: state.key+1
+				tableData
 			}
 		});
 	}

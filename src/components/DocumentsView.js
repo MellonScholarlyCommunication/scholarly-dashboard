@@ -30,11 +30,18 @@ export default class DocumentsView extends React.Component {
         this.changeSearchId = this.changeSearchId.bind(this)
         this.updateSearchId = this.updateSearchId.bind(this)
         this.initializedCollection = this.initializedCollection.bind(this)
-        
+
     }
 
     componentDidMount(){
       this.asyncInit();
+    }
+
+    componentDidUpdate(prevProps) {
+      if (prevProps.selectFile !== this.props.selectFile) {
+        // Update files first because this probably get's called when new file uploaded
+        this.updateSearchId(() => this.selectFile(this.props.selectFile));
+      }
     }
 
     async asyncInit() {
@@ -46,8 +53,8 @@ export default class DocumentsView extends React.Component {
       this.setState({searchId: this.webId, collection: !!collection})
       this.asyncUpdate(this.state.searchId);
     }
-  
-    async asyncUpdate(searchId){
+
+    async asyncUpdate(searchId, afterUpdateCallback = () => {}){
       console.log("getting", this.state, this.webId)
       if(!this.state.collection) return;
       const webId = searchId || this.webId
@@ -64,7 +71,18 @@ export default class DocumentsView extends React.Component {
       }
       console.log(documents)
       this.fileData = fileData;
-      this.setState({files: documents})
+      this.setState({files: documents}, afterUpdateCallback);
+    }
+
+    selectFile(fileURI) {
+      let selection = {};
+      for (let file of this.state.files) {
+        if (file.id === fileURI) {
+          selection[fileURI] = true;
+          this.chonkyRef.current.setSelection(selection);
+          return;
+        }
+      }
     }
 
     handleSelectionChange = (selection) => {
@@ -89,14 +107,14 @@ export default class DocumentsView extends React.Component {
       this.setState({searchId: e.target.value})
     }
 
-   updateSearchId(){
-      this.asyncUpdate(this.state.searchId)
+    updateSearchId(afterUpdateCallback = () => {}){
+      this.asyncUpdate(this.state.searchId, afterUpdateCallback)
     }
 
     initializedCollection() {
       this.asyncInit()
     }
-    
+
     render() {
       const {files} = this.state;
 

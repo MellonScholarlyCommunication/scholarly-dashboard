@@ -40,7 +40,7 @@ export default class APP extends React.Component {
   getSidebar(){
     if(Object.keys(this.state.selection).length === 0)
       return <NotificationsSideBar selection={this.state.selection} cm={this.cm}
-              fileUploaded={() => this.setState(state => ({ refreshFiles: state.refreshFiles + 1 }))}/> // Re-render file browser
+              fileUploaded={(fileURI) => this.setState({ selectFile: fileURI})}/> // After upload, select file
     return (
       <div>
         <AccessController selection={this.state.selection} cm={this.cm} upload={false}/>
@@ -62,7 +62,7 @@ export default class APP extends React.Component {
           <NavbarComponent className="navbar" cm={this.cm}/>
           <div className="contentcontainer row">
             <div className="maincontentcontainer col-md-8">
-              <MainContent handleSelection={this.handleSelection} cm={this.cm} key={this.state.refreshFiles} />
+              <MainContent handleSelection={this.handleSelection} cm={this.cm} selectFile={this.state.selectFile} />
             </div>
             <div className="sidebarcontainer col-md-4">
               { this.getSidebar() }
