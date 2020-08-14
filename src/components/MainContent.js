@@ -22,11 +22,11 @@ export default class MainContent extends React.Component {
 
 
   render () {
-    const view = <DocumentsView handleSelection={this.handleSelection} cm={this.cm} />
+    const view = <DocumentsView handleSelection={this.handleSelection} cm={this.cm} selectFile={this.props.selectFile} />
     return (
       <div className="maincontent">
         {view}
-      </div>  
+      </div>
     )
   }
 }

@@ -8,7 +8,6 @@ import NotificationsSideBar from 'components/NotificationsSideBar';
 import CommunicationManager from 'util/CommunicationManager';
 import solid from 'solid-auth-client'
 import CommentAddComponent from 'components/CommentAddComponent';
-import { GivePermission } from 'components/GivePermission';
 import { AccessController } from 'components/AccessController';
 
 export default class APP extends React.Component {
@@ -18,6 +17,7 @@ export default class APP extends React.Component {
     this.state = {
       webId: "",
       selection: [],
+      refreshFiles: 0
     };
     this.cm = new CommunicationManager(solid)
     this.handleSelection = this.handleSelection.bind(this);
@@ -39,11 +39,11 @@ export default class APP extends React.Component {
 
   getSidebar(){
     if(Object.keys(this.state.selection).length === 0)
-      return <NotificationsSideBar selection={this.state.selection} cm={this.cm}/>
+      return <NotificationsSideBar selection={this.state.selection} cm={this.cm}
+              fileUploaded={(fileURI) => this.setState({ selectFile: fileURI})}/> // After upload, select file
     return (
       <div>
-        <AccessController selection={this.state.selection} cm={this.cm}/>
-        {/* <GivePermission selection={this.state.selection} cm={this.cm} /> */}
+        <AccessController selection={this.state.selection} cm={this.cm} upload={false}/>
         <CommentsSidebar selection={this.state.selection} cm={this.cm} />
       </div>)
   }
@@ -62,7 +62,7 @@ export default class APP extends React.Component {
           <NavbarComponent className="navbar" cm={this.cm}/>
           <div className="contentcontainer row">
             <div className="maincontentcontainer col-md-8">
-              <MainContent handleSelection={this.handleSelection} cm={this.cm}/>
+              <MainContent handleSelection={this.handleSelection} cm={this.cm} selectFile={this.state.selectFile} />
             </div>
             <div className="sidebarcontainer col-md-4">
               { this.getSidebar() }

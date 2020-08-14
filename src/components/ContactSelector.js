@@ -10,7 +10,7 @@ export default class ContactSelector extends React.Component{
     this.updateConctact = this.updateConctact.bind(this)
     this.removeContact = this.removeContact.bind(this)
     this.submit = this.submit.bind(this)
-    
+
     this.state = {contacts: contacts}
   }
 
@@ -50,6 +50,7 @@ export default class ContactSelector extends React.Component{
     return (
       <div className="contactsselector">
         <p>Select contacts to notify</p>
+        <p style={{fontSize: "small"}}>People below will be able to read your paper</p>
         <button onClick={() => this.addContact()}>addContact</button>
 
         <form>

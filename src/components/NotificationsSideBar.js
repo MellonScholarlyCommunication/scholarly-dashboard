@@ -75,7 +75,7 @@ export default class NotificationsSideBar extends React.Component {
           </div>
         </div>
         <div className="lowercontainer">
-          <UploadFileComponent className="fileAdd"/>
+          <UploadFileComponent className="fileAdd" fileUploaded={this.props.fileUploaded} />
         </div>
       </div>
     );

@@ -401,19 +401,8 @@ export default class CommunicationManager {
     if (fileUploadResponse.status === 201) {
       // The resource has succesfully been created
       const uploadURL = fileUploadResponse.url;
-      // The paper can be read by friends/contacts
-      // Current session should always be active since upload just succeeded
-      const contacts = await this.getContacts();
-      console.log("Setting READ for all contacts/friends");
-      this.pm.createACL(uploadURL,
-        [createPermission([MODES.READ], contacts)]
-      );
 
-      let metadataURI: any = paperURI.split(".");
-      metadataURI =
-        metadataURI
-          .slice(0, Math.max(1, metadataURI.length - 1))
-          .join(".") + "_meta.ttl";
+      let metadataURI: string = this.getMetadataURI(paperURI);
       metadata.metadatalocation = metadataURI;
       const metadataPatch = MetadataFileGenerator.generatePaperEntry(
         collection.collectionid,
@@ -437,6 +426,13 @@ export default class CommunicationManager {
     return fileUploadResponse;
   }
 
+  getMetadataURI(fileURI: string) {
+    let metadataURI: any = fileURI.split(".");
+    return metadataURI
+          .slice(0, Math.max(1, metadataURI.length - 1))
+          .join(".") + "_meta.ttl";
+  }
+
   async createMetadataFile(
     paperURI: string,
     metadataURI: string,
@@ -448,17 +444,9 @@ export default class CommunicationManager {
       paperURI,
       metadata
     );
-    const post = await this.fu.postAndPatchFile(metadataURI, content);
     // this.fu.postFile(metadataURI, "", "text/turtle")
     // this.fu.patchFile(metadataURI, content)
-    console.log(post);
-    if (post.ok) {
-      // Everyone can read the metadata file
-      this.pm.createACL(metadataURI,
-        [createPermission([MODES.READ], null)] // null for everyone
-      );
-    }
-    return post.ok
+    return (await this.fu.postAndPatchFile(metadataURI, content)).ok;
   }
 
   async addComment(
@@ -491,7 +479,7 @@ export default class CommunicationManager {
 
     const metadataLocation =
       paperMetadata.metadatalocation ||
-      paperMetadata.id + ".meta";
+      this.getMetadataURI(paperMetadata.id)
     const patchMetadata = "INSERT {" + comment.metadata + "}";
     try {
       this.fu.patchFile(metadataLocation, patchMetadata);
