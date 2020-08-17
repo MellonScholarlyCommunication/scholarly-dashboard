@@ -16,6 +16,7 @@ export class AccessController extends React.Component {
 		let documentURI = Object.keys(props.selection)[0];
 
     this.state = {
+			userHasControl: false,
 			documentURI,
       contacts: [],
 			permissions: [],
@@ -43,8 +44,21 @@ export class AccessController extends React.Component {
 		let commentPermissions = await this.cm.pm.getPermissions(this.cm.getMetadataURI(documentURI));
 		let tableData = this.createTableData(permissions, commentPermissions, contacts);
 
+		// Check if user has control
+		let userHasControl = false;
+		let webID = this.cm.getCurrentWebID();
+		for (let row of tableData) {
+			console.log("CHECKUSERCONTROL")
+			console.log(row)
+			if (row.agent === webID && row.control) {
+				console.log("FOUND")
+				userHasControl = true;
+				break;
+			}
+		}
 		this.setState(state => {
 			return {
+				userHasControl:
 				documentURI,
 				contacts,
 				permissions,
@@ -148,6 +162,7 @@ export class AccessController extends React.Component {
 	}
 
 	render() {
+		if (!this.state.userHasControl) { return null; }
     return (
 			<>
         <p>Permissions for this file</p>
