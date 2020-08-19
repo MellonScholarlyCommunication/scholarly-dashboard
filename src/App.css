@@ -51,10 +51,25 @@ html, body, #root, #app, #app>div {
   border: 1px solid black;
 }
 
+.sidebarexpand {
+  background-color: gray;
+  border: 1px solid black;
+  font-size: xx-large;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  z-index: 2000;
+  right: 2px;
+  position: absolute;
+}
 
 .sidebarcontainer {
   height: 100%;
   border: 1px solid black;
-  display: inline-block;
-  padding: 5px;
+  padding: 10px;
+  z-index: 1000;
+  right: 0px;
+  background-color: white;
+  position: absolute;
 }

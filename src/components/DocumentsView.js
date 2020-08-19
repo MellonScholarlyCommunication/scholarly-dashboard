@@ -30,7 +30,7 @@ export default class DocumentsView extends React.Component {
         this.changeSearchId = this.changeSearchId.bind(this)
         this.updateSearchId = this.updateSearchId.bind(this)
         this.initializedCollection = this.initializedCollection.bind(this)
-
+        this.onFileOpen = this.onFileOpen.bind(this)
     }
 
     componentDidMount(){
@@ -102,6 +102,10 @@ export default class DocumentsView extends React.Component {
       this.props.handleSelection(documentSelection)
     };
 
+    onFileOpen = ({ id }) => {
+      window.open(id, '_blank');
+    }
+
     changeSearchId(e){
       console.log("updating search id", e.target.value)
       this.setState({searchId: e.target.value})
@@ -128,7 +132,8 @@ export default class DocumentsView extends React.Component {
         <div className="documentsviewcontainer disable-scrollbars">
           <FileBrowser ref={this.chonkyRef}
             files={files} view={FileView.SmallThumbs}initializedCollection
-            onSelectionChange={this.handleSelectionChange}/>
+            onSelectionChange={this.handleSelectionChange}
+            onFileOpen={this.onFileOpen} />
           <div className="refreshDivButton" onClick={() => {this.updateSearchId()}}> Go </div>
           <input className="searchLocation" value={this.state.searchId} onChange={this.changeSearchId} />
         </div>

@@ -17,10 +17,12 @@ export default class APP extends React.Component {
     this.state = {
       webId: "",
       selection: [],
-      refreshFiles: 0
+      refreshFiles: 0,
+      sideBarVisible: false
     };
     this.cm = new CommunicationManager(solid)
     this.handleSelection = this.handleSelection.bind(this);
+    this.toggleSideBar = this.toggleSideBar.bind(this);
   }
 
   componentDidMount(){
@@ -34,7 +36,11 @@ export default class APP extends React.Component {
 
   handleSelection(newSelection) {
     console.log("selected", "old", this.state.selection, "new", newSelection)
-    this.setState({selection: newSelection})
+    this.setState({
+      selection: newSelection,
+      // Show sidebar if file selected
+      sideBarVisible: Object.keys(newSelection).length > 0
+    })
   }
 
   getSidebar(){
@@ -46,6 +52,10 @@ export default class APP extends React.Component {
         <AccessController selection={this.state.selection} cm={this.cm} upload={false}/>
         <CommentsSidebar selection={this.state.selection} cm={this.cm} />
       </div>)
+  }
+
+  toggleSideBar() {
+    this.setState(old => ({ sideBarVisible: !old.sideBarVisible }));
   }
 
   render(){
@@ -61,12 +71,19 @@ export default class APP extends React.Component {
       <div className="App">
           <NavbarComponent className="navbar" cm={this.cm}/>
           <div className="contentcontainer row">
-            <div className="maincontentcontainer col-md-8">
+            <div className="maincontentcontainer col">
               <MainContent handleSelection={this.handleSelection} cm={this.cm} selectFile={this.state.selectFile} />
             </div>
-            <div className="sidebarcontainer col-md-4">
-              { this.getSidebar() }
-            </div>
+            {this.state.sideBarVisible ? (
+              <>
+                <div className="sidebarcontainer col-md-4">
+                  { this.getSidebar() }
+                </div>
+                <div className="sidebarexpand" onClick={this.toggleSideBar}>&gt;</div>
+              </>
+            ) : (
+              <div className="sidebarexpand" onClick={this.toggleSideBar}>&lt;</div>
+            )}
           </div>
       </div>
     );

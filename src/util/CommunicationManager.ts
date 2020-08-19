@@ -33,6 +33,14 @@ export default class CommunicationManager {
     this.pm = new PermissionManager(auth)
   }
 
+  async getCurrentWebID() {
+    let session = await this.auth.currentSession();
+    if (!(session && session.webId)) {
+      throw new Error("No valid session or webId");
+    }
+    return session.webId;
+  }
+
   async loadProfile(
     webidprofile: string
   ): Promise<N3.Store | null> {
