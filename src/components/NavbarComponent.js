@@ -17,7 +17,7 @@ const NavbarComponent = (props) => {
               Welcome <Value src="user.name"/>
             </Navbar.Text> 
         </LoggedIn>
-        <AuthButton className="authButton" popup="https://solid.community/common/popup.html" login="Login" logout="Logout"/>
+        <AuthButton className="authButton" popup="https://inrupt.net/common/popup.html" login="Login" logout="Logout"/>
       </Navbar.Collapse>
     </Navbar>  
   );

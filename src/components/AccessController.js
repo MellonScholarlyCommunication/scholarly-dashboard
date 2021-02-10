@@ -178,7 +178,7 @@ export class AccessController extends React.Component {
 			<>
 				<p>Permissions for this file</p>
 				<AccessControlTable tableData={this.state.tableData}
-					submitValues={data => this.setState({ tableData: data }, this.submitValues)} />
+					submitValues={data => () => this.setState({ tableData: data }, this.submitValues)} />
 			</>
 		);
 	}

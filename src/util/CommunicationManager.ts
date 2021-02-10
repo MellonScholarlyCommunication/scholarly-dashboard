@@ -265,9 +265,11 @@ export default class CommunicationManager {
       : [collection.collectionid];
     let researchPapers: Array<PaperMetadata> = [];
     for (let collectionView of collectionViewURIs) {
+      console.log('collectionView, ', collectionView)
       researchPapers = researchPapers.concat(
         await this.getResearchPapersFromFile(collectionView)
       );
+      console.log('researchPapers, ', researchPapers)
     }
     return researchPapers;
   }
@@ -279,6 +281,7 @@ export default class CommunicationManager {
     let paperIds = store
       .getQuads(null, RDF + "type", RESEARCH_PAPER_CLASS, null)
       .map((quad: N3.Quad) => quad.subject.id);
+      console.log('paperIds', paperIds, store)
     return paperIds.map((paperId: string) => {
       const titleQuad = store.getQuads(
         paperId,
