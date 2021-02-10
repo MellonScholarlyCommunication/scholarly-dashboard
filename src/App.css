@@ -1,8 +1,12 @@
 .App {
   text-align: center;
-  height: 100%;
-  display: flex;
-  flex-flow: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -13,7 +17,7 @@
 
 .App-header {
   background-color: #282c34;
-  max-height: 10vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,50 +30,109 @@
   color: #61dafb;
 }
 
-html, body, #root, #app, #app>div {
-  height: 100%;
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.row {
   width: 100%;
-}
-
-.navbar {
-  height: 60px;
-}
-
-.contentcontainer {
-  flex-grow: 1;
-  height: calc(100% - 65px);
-  width: 100%;
-  padding: 10px;
-  margin: auto;
-}
-
-
-.maincontentcontainer {
   height: 100%;
-  display: inline-block;
-  padding: 5px;
-  border: 1px solid black;
 }
 
-.sidebarexpand {
-  background-color: gray;
-  border: 1px solid black;
-  font-size: xx-large;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-top: 5px;
-  cursor: pointer;
-  z-index: 2000;
-  right: 2px;
-  position: absolute;
-}
-
-.sidebarcontainer {
+.col {
   height: 100%;
-  border: 1px solid black;
-  padding: 10px;
-  z-index: 1000;
-  right: 0px;
+  word-break: break-word;
+}
+
+.container {
   background-color: white;
-  position: absolute;
+  padding-top: 3px;
+  padding-bottom: 10px;
+  margin-top: 25px;
+}
+
+li{
+  list-style-type: none;
+}
+
+.pageheader {
+  border-bottom: 1px solid black;
+  font-weight: bold;
+}
+
+.centeraligntext {
+  text-align: center;
+  width: 100%;
+}
+
+.leftaligntext {
+  text-align: left;
+  width: 100%;
+}
+
+#mainscreencontainer {
+  /* margin-left: 5%; */
+}
+
+/* button {
+  font-weight: bold !important;
+} */
+
+.toolbarcolor {
+  background-color: #3f51b5;
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+}
+
+header {
+  background-color: #3f51b5;
+  color: #fff;
+}
+
+.sidebar {
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.sidebarcontent {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.active {
+  background-color: lightgray !important;
+}
+
+.nonactive{
+  background-color: none;
+}
+
+.backbutton {
+  float: top right;
+}
+
+h4 {
+  margin-bottom: 20px !important;
+}
+
+.topmenuitem {
+  margin: 3px !important; 
+}
+
+.topmenuitemleft {
+  margin-left: auto !important;
+}
+
+.container {
+  min-height: 75vh;
+}
+
+.chonky-root {
+  min-height: 60vh;
 }

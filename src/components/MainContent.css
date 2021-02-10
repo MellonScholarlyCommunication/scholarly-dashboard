@@ -1,8 +1,0 @@
-.maincontent {
-  height: 100%;
-  width: 100%;
-}
-.disable-scrollbars::-webkit-scrollbar {
-  width: 0px;
-  background: transparent; /* Chrome/Safari/Webkit */
-}

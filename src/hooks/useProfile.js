@@ -1,29 +1,28 @@
 import { useState, useEffect } from 'react';
-import { getPromiseValueOrUndefined, getProfileData } from '../util/Util'
 import { useLiveUpdate, } from '@solid/react';
 import { clearCache } from '../singletons/QueryEngine';
+import { fetchProfile } from '../util/MellonUtils/profile'
 
 const useProfile = function(webId) {
-  const liveUpdate = useLiveUpdate(webId)
   const [profile, setProfile] = useState(null);
+  const liveUpdate = useLiveUpdate(webId)
 
   useEffect(() => {
     let mounted = true
-    const fetchProfile = async () => {
-      try {
-        await clearCache(webId)
-        const profile = await getProfileData(webId)
-        if (profile && mounted) {
+    const getProfile = async () => {
+      if(!webId) return
+      await clearCache(webId)
+      const profile = await fetchProfile(webId)
+      if (mounted) {
+        if(profile) {
           profile.webId = webId
           setProfile(profile)
         } else {
           setProfile(null)
         }
-      } catch {
-        setProfile(null)
-      }
+      } 
     }
-    fetchProfile();
+    getProfile();
     return () => mounted = false
   }, [webId, liveUpdate])
   return profile

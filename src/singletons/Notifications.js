@@ -1,9 +1,11 @@
 import { getValArray, getVal, clearCache } from './QueryEngine';
-import ns from '../util/NameSpaces';
+import ns from "../util/NameSpaces"
 import NotificationProcesser from '../util/NotificationProcesser';
 
+const { default: data } = require('@solid/query-ldflex');
+
 const EventEmitter = require('events');
-const { deleteFile } = require('../util/FileUtil');
+const { deleteFile, postFile } = require('../util/FileUtil');
 
 const POLLINGRATE = 10000;
 
@@ -56,13 +58,6 @@ class NotificationHandler extends EventEmitter {
     this.emit('notifications', this.getNotifications());
   }
 
-  getInbox = async () => {
-    if (!this.webId) return null;
-    if (this.inbox) return this.inbox;
-    else { this.inbox = await fetchInboxId(this.webId) }
-    return this.inbox;
-  }
-
   checkNewNotificationIds = (oldNotificationIds, newNotificationsIds) => {
     const oldIdsSorted = oldNotificationIds.sort();
     const newIdsSorted = newNotificationsIds.sort();
@@ -70,7 +65,7 @@ class NotificationHandler extends EventEmitter {
   }
 
   async checkNewNotifications() {
-    const inbox = await this.getInbox()
+    const inbox = this.webId ? await getInbox(this.webId) : null;
     if(!inbox) return;
     clearCache(inbox);
     
@@ -178,3 +173,18 @@ export function getNotificationManager(webId) {
   return InboxManager.getInstance(webId);
 }
 
+
+
+export default async function notify(notificationBody, subjects) {
+  const distinct = (value, index, self) => self.indexOf(value) === index;
+  for (let subject of subjects.filter(distinct)) {
+    const inbox = await getInbox(subject);
+    if (inbox) postFile(inbox, notificationBody)
+  }
+}
+
+async function getInbox(subject){
+  const inbox = await data[subject][ns.ldp('inbox')]
+  if(!inbox) console.error(subject + ' does not profide an inbox.')
+  return inbox && inbox.value
+}

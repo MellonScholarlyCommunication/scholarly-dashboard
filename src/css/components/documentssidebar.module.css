@@ -1,0 +1,12 @@
+
+.documentssidebar {
+  height: 100%;
+  border: 1px solid black;
+  padding: 10px;
+  z-index: 1000;
+  right: 0px;
+  top: 75px;
+  max-width: 20vw;
+  background-color: white;
+  position: absolute;
+}

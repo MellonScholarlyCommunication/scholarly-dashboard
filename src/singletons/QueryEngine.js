@@ -40,5 +40,4 @@ export async function getValArray(...args) {
 export async function clearCache(documentId) {
   const data = QueryEngine.getInstance();
   await data.clearCache(documentId.split('#')[0])
-  console.log('cleared', documentId.split('#')[0])
 }
