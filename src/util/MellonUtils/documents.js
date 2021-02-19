@@ -5,7 +5,7 @@ import { getError } from "../../Errors/errors";
 import { createACL, createPermission, MODES } from "../PermissionManager";
 import { fetchProfile } from "./profile";
 import { getBaseIRI } from "../Util";
-import notify from "../../singletons/Notifications";
+import { getInboxAgent } from "singletons/InboxAgent";
 
 /**
  * Check profile for a publications collection
@@ -117,7 +117,8 @@ const uploadDocument = async (documentMetadata, webId) => {
   console.log('got metadata', metadataFileId)
   // Notify contacts
   const notificationBody = createPublicationUploadNotification(webId, documentId, metadataFileId)
-  notify(notificationBody, contacts)
+  const agent = getInboxAgent(webId) 
+  agent.sendNotification({notification: notificationBody, to: contacts})
   
   return documentId
 
@@ -202,7 +203,8 @@ const createAndPostComment = async (webId, commentData, metadataId) => {
   const commentNotification = createCommentNotifications(webId, absolutecommentLocation, commentData)
   const profile = await fetchProfile(webId) || null
   let contacts = (profile && profile.contacts) || [];
-  notify(commentNotification, contacts)
+  const agent = getInboxAgent(webId) 
+  agent.sendNotification({notification: commentNotification, to: contacts})
 
   return true
 }

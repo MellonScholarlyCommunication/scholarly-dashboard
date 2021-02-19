@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
-import { getNotificationManager } from '../singletons/Notifications';
+import { getInboxAgent } from 'singletons/InboxAgent';
 
-
-const useNotifications = function(webId) {
+const useNotifications = function(webId, showSystemNotification = false) {
   const [notifications, setNotifications] = useState([]);
+  var agent = null;
   useEffect(() => {
-    let manager = getNotificationManager(webId); 
-    if(!manager) return
-    manager.on('notifications', setNotifications)
-    const notifications = manager.getNotifications();
-    if (notifications && notifications.length) setNotifications(notifications);
+    agent = getInboxAgent(webId);
+    agent.on('notifications', (notifications) => setNotifications(notifications)) 
     return () => {
-      manager = null;
+      agent = null
     }
   }, [webId])  
   return notifications;
 }
+
 
 export default useNotifications
