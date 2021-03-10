@@ -58,16 +58,7 @@ const DocumentInfoViewer = (props) => {
       <ResourceMissingComponent />
     </div>
   )
-
-//   abstract: "aedfefq"
-// authors: ["https://bob.localhost:8443/profile/card#me"]
-// comments: undefined
-// date: Invalid Date {}
-// id: "https://bob.localhost:8443/public/paper2_meta.ttl"
-// keywords: [""]
-// title: "wqerqe"
-// type: "http://example.com/Publication"
-
+  
   const getRepresentation = (key, metadata) => {
     if(!key) return null
     switch (key) {

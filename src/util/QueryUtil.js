@@ -1,5 +1,6 @@
 import { DataFactory, Writer, Quad } from "n3";
 import ns from "../util/NameSpaces"
+import * as f from "@dexagod/rdf-retrieval"
 
 const { namedNode, literal, quad, variable } = DataFactory;
 
@@ -24,9 +25,9 @@ export async function createDeleteInsertProfileDataQuery(webId, oldprofile, newp
   //   deleteClause.push(quad(namedNode(webId), namedNode(ns.demo('civilstatus')), literal(oldprofile.cstatus)))
   }
 
-  const deleteClauseString = deleteClause.length ? `DELETE { ${await quadListToTTL(deleteClause)} }` : ''
-  const insertClauseString = insertClause.length ? `INSERT { ${await quadListToTTL(insertClause)} }` : ''
-  const whereClauseString = deleteClause.length ? `WHERE { ${await quadListToTTL(deleteClause)} }` : ''
+  const deleteClauseString = deleteClause.length ? `DELETE { ${await f.quadArrayToString(deleteClause, "text/turle")} }` : ''
+  const insertClauseString = insertClause.length ? `INSERT { ${await  f.quadArrayToString(insertClause, "text/turtle")} }` : ''
+  const whereClauseString = deleteClause.length ? `WHERE { ${await  f.quadArrayToString(deleteClause, "text/turtle")} }` : ''
 
 
   return(`
@@ -34,16 +35,4 @@ export async function createDeleteInsertProfileDataQuery(webId, oldprofile, newp
     ${insertClauseString}
     ${whereClauseString}
   `)
-}
-
-
-export async function quadListToTTL(quadList) { 
-  return new Promise((resolve, reject) => {
-    const writer = new Writer();
-    writer.addQuads(quadList)
-    writer.end((error, result) => {
-      if (error || !result) reject(error || "Could not generate ttl file from quads")
-      resolve(result)
-    });
-  })
 }

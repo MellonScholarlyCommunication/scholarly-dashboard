@@ -25,6 +25,8 @@ const NotificationsViewerComponent = (props) => {
     for (const property in notificationObject) {
       notificationProperties.push(property)
     }
+
+    console.log('notificationProperties', notificationProperties)
   
     
     // const viewPublication = (notification) => viewDocument(notification.object.object.id);
