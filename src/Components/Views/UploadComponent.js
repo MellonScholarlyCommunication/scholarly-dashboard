@@ -9,7 +9,7 @@ import useProfile from '../../hooks/useProfile';
 import ProfileCardSelectorComponent from '../ProfileCardSelectorComponent';
 import ProfileCardErrorWrapper from '../ProfileCardErrorWrapper';
 import { fetchProfile, createCollection } from '../../util/MellonUtils/profile';
-import { uploadDocument, getDocumentsCollection } from '../../util/MellonUtils/documents'
+import { uploadPublication, getDocumentsCollection } from '../../util/MellonUtils/documents'
 import { getBaseIRI, availableViews, routeViewWithParams } from '../../util/Util';
 import { useHistory } from "react-router-dom";
 
@@ -56,13 +56,13 @@ const UploadComponent = (props) => {
     // Clean up upload object
     console.log('trying to submit', submission)
     submission.authors = submission.authors.map(a => a.webId).filter(a => !!a)
-    submission.keywords = submission.authors.map(k => k.val).filter(k => !!k)
+    submission.keywords = submission.keywords.map(k => k.val).filter(k => !!k)
     submission.file = submission.file[0]
     if (await validateSubmission(submission)) {
       if (!props.webId) window.alert('There seems to be an issue with retrieving your pod information. Please refresh the page and try again.')
       await checkAndInitializeCollection(props.webId)
       try { 
-          const documentId = await uploadDocument(submission, props.webId);
+          const documentId = await uploadPublication(submission, props.webId);
           const route = routeViewWithParams(availableViews.documentinfo, {documentId: documentId})
           history.push(route);
       } catch (e) {

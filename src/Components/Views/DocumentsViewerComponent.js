@@ -1,68 +1,53 @@
 import React, { useState, useEffect } from 'react';
-// Import Chonky
-import 'chonky/style/main.css';
-import {FileBrowser, FileView, FileToolbar, FileSearch, FileList} from 'chonky';
 import "../../css/DocumentsView.css"
-import { getDocumentAndMetadataIds, getDocumentsCollection } from '../../util/MellonUtils/documents';
-import { availableViews, routeViewWithParams } from '../../util/Util';
+import { getPublicationIds, getDocumentsCollection, getPublicationData } from '../../util/MellonUtils/documents';
 import { useHistory } from "react-router-dom";
+import ArtefactCard from 'Components/Documents/ArtefactCard';
 
 const DocumentsViewerComponent = (props) => {
-  const webId = props.selectedWebId || props.webId
-  const history = useHistory();
-  const [documentsMetadata, setdocumentsMetadata] = useState([])
+  const ownerWebId = props.selectedWebId || props.webId
+  const [foundPublications, setFoundPublications] = useState([])
 
-  console.log('documentsMetadata', documentsMetadata)
   useEffect(() => {
-    if(!webId) return;
+    if(!ownerWebId) return;
     let mounted = true;
-    getDocumentAndMetadataIds(webId).then(documentsData => {
-      // TODO:: replace this by title from .meta file 
-      documentsData = documentsData.map(obj => { obj.name = obj.id.split('/')[obj.id.split('/').length - 1]; return(obj) })
-      if(mounted && documentsData && documentsData.length) setdocumentsMetadata(documentsData)
-    })
-    return () => {
-      mounted = false;
-    }
-  }, [webId])
-  
-  //TODO:: fix in case of multiple selection, can only handle 1 at a time
-  const handleAction = (action, data) => {
-    console.log('data', data)
-    if (data.actionId === "open_files") {
-      if (webId && data && data.target && data.target.id) {
-        const route = routeViewWithParams(availableViews.documentinfo, {documentId: data.target.id})
-        history.push(route);
-      } else {
-        window.alert('Could not retrieve document location. Please try again.')
+    const f = async () => {
+      const publications = []
+      const publicationIds = await getPublicationIds(ownerWebId)
+      for (let publicationId of publicationIds) {
+        publications.push(new Promise((resolve, reject) => {
+          getPublicationData(publicationId).then(publicationData => {
+            publicationData.name = publicationData.title
+            console.log('resolving', publicationData)
+            resolve(publicationData)
+          })
+        }))
       }
+      return await Promise.all(publications)
     }
-  }
+    f().then(publications => {
+      if (mounted) setFoundPublications(publications)
+    })
+    return () => mounted = false;
+  }, [ownerWebId])
 
+  console.log("foundPublications", foundPublications)
 
-  /**
-   * TODO:: Fetch paper metadata file???
-   */
 
 
   return (
     <div id="documentscomponent" className='container'>
-      <h4> Documents </h4>
+      <h4> Publications </h4>
       <br />
-      <p>Doube click file to see file information. Will probably subsitute this directory view to a list based view on the available publications</p>
-      <FileBrowser files={documentsMetadata} onFileAction={handleAction}>
-          <FileToolbar />
-          <FileSearch />
-          <FileList />
-      </FileBrowser>
+      {foundPublications.map(publicationData => {return (
+        <ArtefactCard publicationData={publicationData} fields={['title', 'authors', 'abstract', 'keywords']} />
+      )})}
     </div>
   )
 }
 
 
+
+
+
 export default DocumentsViewerComponent
-
-
-
-  // const folderChain = React.useMemo( () => [ { id: 'xXre', name: 'Publications' }, ], [] );
-  // <FileBrowser files={files} folderChain={folderChain}>

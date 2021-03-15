@@ -25,7 +25,7 @@ export async function createDeleteInsertProfileDataQuery(webId, oldprofile, newp
   //   deleteClause.push(quad(namedNode(webId), namedNode(ns.demo('civilstatus')), literal(oldprofile.cstatus)))
   }
 
-  const deleteClauseString = deleteClause.length ? `DELETE { ${await f.quadArrayToString(deleteClause, "text/turle")} }` : ''
+  const deleteClauseString = deleteClause.length ? `DELETE { ${await f.quadArrayToString(deleteClause, "text/turtle")} }` : ''
   const insertClauseString = insertClause.length ? `INSERT { ${await  f.quadArrayToString(insertClause, "text/turtle")} }` : ''
   const whereClauseString = deleteClause.length ? `WHERE { ${await  f.quadArrayToString(deleteClause, "text/turtle")} }` : ''
 

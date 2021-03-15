@@ -57,6 +57,7 @@ const aliases = {
 
   hydra: "http://www.w3.org/ns/hydra/core#",
   dbo: 'http://dbpedia.org/ontology/',
+  ldes: 'https://w3id.org/ldes#',
   
   ex: 'https://www.example.org/ontology#',
 }
