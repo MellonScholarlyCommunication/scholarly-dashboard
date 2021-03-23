@@ -1,7 +1,7 @@
 .container {
   border: 1px solid black;
   border-radius: 5px;
-  widows: auto;
+  width: auto;
   margin: auto;
 }
 

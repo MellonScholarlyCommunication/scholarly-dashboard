@@ -15,7 +15,7 @@ function App () {
 
   const mainviewcomponents = {
     defaultView: 'profile',
-    sideBarItems: ['divider', 'profile', 'divider', 'documents', 'divider', 'feed', 'divider', 'contacts', 'divider', 'br', 'divider', 'upload', 'divider'],
+    sideBarItems: ['divider', 'profile', 'divider', 'documents', 'divider', 'feed', 'divider', 'contacts', 'divider', 'listsub', 'divider', 'br', 'divider', 'upload', 'divider'],
     topBarItems: ['notifications', 'help'],
     hidelogout: false,
   }

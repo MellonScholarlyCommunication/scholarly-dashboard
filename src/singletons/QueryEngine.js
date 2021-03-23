@@ -32,7 +32,8 @@ export async function getValArray(...args) {
       resultValues.push(result.value)
     }
     return resultValues
-  } catch {
+  } catch (e) {
+    console.error(e)
     return null;
   }
 }

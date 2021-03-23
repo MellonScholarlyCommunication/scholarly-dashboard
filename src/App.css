@@ -136,3 +136,19 @@ h4 {
 .chonky-root {
   min-height: 60vh;
 }
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.row {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.errortext {
+  color: red;
+}

@@ -11,9 +11,9 @@ const getContentType = (URI) => {
   return mime.getType(URI.split('#')[0]) || 'text/turtle'
 }
 
-export async function getFile(URI) {
-  return doRequest('GET', URI, null, null)
-}
+// export async function getFile(URI) {
+//   return doRequest('GET', URI, null, null)
+// }
 
 export async function patchFile(URI, body) {
   clearCache(URI);
@@ -36,15 +36,21 @@ export async function deleteFile(URI) {
 }
 
 async function doRequest(requestType, URI, body, headers, showPopups) {
-  const options = {method: requestType}
-  if (body) options.body = body
-  if (headers) options.headers = headers
-  const response = await auth.fetch(URI, options);
-  const code = (await response).status
-  if (validStatusCodes.indexOf(code) === -1) {
-    showErrorPopup(URI, code, requestType, showPopups)
+  try {
+    const options = {method: requestType}
+    if (body) options.body = body
+    if (headers) options.headers = headers
+    const response = await auth.fetch(URI, options);
+    const code = (await response).status
+    if (validStatusCodes.indexOf(code) === -1) {
+      showErrorPopup(URI, code, requestType, showPopups)
+    }
+    return response;
+  } catch (e) {
+    throw new Error(`Error during ${requestType} operation on ${URI}`)
+    return null;
   }
-  return response;
+  
 }
 
 function showErrorPopup(URI, statusCode, requestType, showPopups) {

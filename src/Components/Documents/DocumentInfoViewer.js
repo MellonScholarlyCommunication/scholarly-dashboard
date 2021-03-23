@@ -4,13 +4,10 @@ import CommentsSidebar from './CommentsSidebar'
 import AccessController from './AccessController'
 import ResourceMissingComponent from '../ResourceMissingComponent'
 import { getPublicationIds, getDocumentMetadata, getPublicationData, retrieveLDESEvents } from '../../util/MellonUtils/documents'
-import { getVal } from '../../singletons/QueryEngine'
 import { IconButton } from '@material-ui/core'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router-dom'
 import { routeViewWithParams, availableViews } from '../../util/Util'
-import { getFile, parse_link_header } from '../../util/FileUtil'
-import { getResourceAsStore } from '@dexagod/rdf-retrieval'
 
 const DocumentInfoViewer = (props) => {
   const userwebId = props.webId

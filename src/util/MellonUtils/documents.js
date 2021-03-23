@@ -1,6 +1,6 @@
 import { getVal, getValArray } from "../../singletons/QueryEngine";
 import ns from "../NameSpaces";
-import { putFile, patchFile, postFile, getFile } from "../FileUtil";
+import { putFile, patchFile, postFile } from "../FileUtil";
 import { getError } from "../../Errors/errors";
 import { createACL, createPermission, MODES } from "../PermissionManager";
 import { getBaseIRI } from "../Util";

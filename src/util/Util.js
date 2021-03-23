@@ -8,6 +8,7 @@ import LoginComponent from '../Components/Login/LoginComponent'
 
 import PersonIcon from '@material-ui/icons/Person';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+
 import HelpIcon from '@material-ui/icons/Help';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import CardMembershipIcon from '@material-ui/icons/CardMembership';
@@ -17,6 +18,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ContactsIcon from '@material-ui/icons/Contacts';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import PublishIcon from '@material-ui/icons/Publish';
+import AssistantPhotoIcon from '@material-ui/icons/AssistantPhoto';
 
 import FeedComponent from '../Components/Views/FeedComponent'
 import DocumentsViewerComponent from '../Components/Views/DocumentsViewerComponent'
@@ -24,6 +26,7 @@ import ContactsComponent from '../Components/Views/ContactsComponent'
 import ResourceMissingComponent from '../Components/ResourceMissingComponent'
 import UploadComponent from '../Components/Views/UploadComponent'
 import DocumentInfoViewer from '../Components/Documents/DocumentInfoViewer'
+import SubscriptionComponent from '../Components/SubscriptionComponent'
 import { Switch, Route } from 'react-router-dom'
 import withContent from '../HOC/withContent'
 
@@ -49,6 +52,7 @@ export const availableViews = {
   missing:        {id:"missing",          label:'Resource Missing', component: ResourceMissingComponent,      generation:(props) => <ResourceMissingComponent {...props}/>,     icon: <HelpIcon />,             target: '/missing',       newtab: false},
   upload:         {id:"upload",           label:'Upload',           component: UploadComponent,               generation:(props) => <UploadComponent {...props}/>,              icon: <PublishIcon />,          target: '/upload',        newtab: false},
   documentinfo:   {id:"documentinfo",     label:'Document info',    component: DocumentInfoViewer,            generation:(props) => <DocumentInfoViewer {...props}/>,           icon: <HelpIcon />,             target: '/docinfo',       newtab: false},
+  listsub:        {id:"subcriptions",     label:'Subcriptions',     component: SubscriptionComponent,         generation:(props) => <SubscriptionComponent {...props}/>,        icon: <AssistantPhotoIcon />,   target: '/subscriptions', newtab: false},
 }
 
 export const getAvailableRoutes = () => {
@@ -78,6 +82,7 @@ export const activeDrawerItemMapping = {
   submissionview:   "official",
   notifications:    "notifications",
   help:             "help",
+  listsub:          "listsub",
 }
 
 
@@ -111,4 +116,20 @@ export function routeViewWithParams (view, params) {
   }
   return paramString === '?' ? route : route+paramString.slice(0, -1) // slice away last & sign
 
+}
+
+
+export const SubscriptionTopic = {
+  AUHTORID: "authorId",
+  ARTEFACTID: "artefactId",
+  KEYWORD: "keyword",
+  TITLE: "title",
+}
+export class Subscription {
+  constructor (topic, value, url, id) {
+    this.topic = topic;
+    this.value = value;
+    this.url = url;
+    this.id = id;
+  }
 }

@@ -33,12 +33,12 @@ const ProfileCardErrorWrapper = (props) => {
   const warnings = getWarnings(profile)
   if(!profile) return (
     <div id="ProfileCardErrorWrapper">
-      {warnings && <b style={{color: 'red'}}>{warnings}</b>}
+      {warnings && <b className="errortext">{warnings}</b>}
     </div>
   )
   return (
     <div id="ProfileCardErrorWrapper">
-      {warnings && <b style={{color: 'red'}}>{warnings}</b>}
+      {warnings && <b className="errortext">{warnings}</b>}
       <Row className='propertyview ' key={"profileview"}>
         <Col md={2}></Col>
         <Col md={8}><ProfileCardComponent webId={props.webId} profileWebId={props.webIdInput} key={props.webIdInput} showButtons={false}></ProfileCardComponent></Col>

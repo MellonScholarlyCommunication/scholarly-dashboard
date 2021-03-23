@@ -40,7 +40,7 @@ const DocumentsViewerComponent = (props) => {
       <h4> Publications </h4>
       <br />
       {foundPublications.map(publicationData => {return (
-        <ArtefactCard publicationData={publicationData} fields={['title', 'authors', 'abstract', 'keywords']} />
+        <ArtefactCard publicationData={publicationData} key={publicationData.id} fields={['title', 'authors', 'abstract', 'keywords']} />
       )})}
     </div>
   )
