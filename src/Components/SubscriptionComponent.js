@@ -4,6 +4,8 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { Subscription, SubscriptionTopic } from 'util/Util';
 import { useForm } from "react-hook-form";
 import styles from '../css/components/profilecard.module.css'
+import { createFollowEventNotification } from 'util/MellonUtils/notifications';
+import { getInboxAgent } from 'singletons/InboxAgent';
 
 // TODO:: on error, reload page
 
@@ -20,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SubscriptionComponent = () => {
+const SubscriptionComponent = (props) => {
 
   const [addSubView, setAddSubView] = useState(false)
 
@@ -32,11 +34,17 @@ const SubscriptionComponent = () => {
   ])
 
   const submitSubscription = async(subscription) => {
+
+    const notification = createFollowEventNotification(props.webId, [subscription])
+    const agent = getInboxAgent(props.webId)
     // await dosomething
     // on success
-
-    // add returned id to subscription
-    subscription.id = Math.round(Math.random() * 100).toString()
+    agent.sendNotification({
+      to: [ props.webId ],
+      contentType: "application/ld+json",
+      contentTypeOutput: "application/ld+json",
+      notification: notification,
+    })
 
     const newstate = subscriptions.slice()
     newstate.push(subscription)
@@ -56,11 +64,13 @@ const SubscriptionComponent = () => {
     return (
       <div>
         <div className={styles.container}>
-          <Row key={subscription.id}>
+          <Row key={subscription.id || Math.round(Math.random() * 100)}>
             <Col> {subscription.topic} </Col>
             <Col> {subscription.value} </Col>
             <Col> {subscription.url} </Col>
-            <Col><Button onClick={ () => removeSubscription(subscription)}> {"X"} </Button></Col>
+            { subscription.id
+              ? <Col><Button onClick={ () => removeSubscription(subscription)}> {"X"} </Button></Col> 
+              : <Col>Pending</Col>}
           </Row>
         </div>
         <div style={{height: "5px"}} />
@@ -94,32 +104,12 @@ const SubscriptionComponent = () => {
 }
 
 const SubscriptionCreateComponent = (props) => {
-  const { register, handleSubmit, watch, errors } = useForm();
+  const { register, handleSubmit, errors } = useForm();
   const onSubmit = data => { 
     console.log(data);
     const subscriptionObject = new Subscription(data.topic, data.value, data.url)
     props.onSubmit(subscriptionObject)
   }
-
-  const classes = useStyles();
-  // const [state, setState] = useState({topic: null, value: null, url: null});
-
-  const subscriptions = [
-    new Subscription(SubscriptionTopic.AUHTORID, "https://carol.localhost:8443/profile/card#me", "https://myservice.com/subscriptions/"),
-    new Subscription(SubscriptionTopic.KEYWORD, "test", "https://myservice.com/subscriptions/"),
-    new Subscription(SubscriptionTopic.TITLE, "Test title", "https://myservice.com/subscriptions/"),
-    new Subscription(SubscriptionTopic.ARTEFACTID, "https://carol.localhost:8443/publications/publication.ttl", "https://myservice.com/subscriptions/"),
-  ]
-
-  // const handleChange = (field, event) => {
-  //   const newstate = Object.assign({}, state);
-  //   newstate[field] = event.target.value
-  //   setState(newstate);
-  // };
-
-  // const submit = () => {
-  //   console.log('SUBMITTING', state)
-  // }
 
   return (
     <div id="createsubscriptioncomponent" className={styles.container}>
@@ -127,7 +117,6 @@ const SubscriptionCreateComponent = (props) => {
         <Row>
           <Col><b>Topic</b></Col>
           <Col><b>Value</b></Col>
-          <Col><b>Service URL</b></Col>
         </Row>
         <Row>
           <Col>
@@ -139,7 +128,6 @@ const SubscriptionCreateComponent = (props) => {
           </select>
           </Col>
           <Col><input name="value" className="inputfield" ref={register({ required: true })} /></Col>
-          <Col><input name="url" className="inputfield" ref={register({ required: true })} /></Col>
         </Row>
         <Row>
           <Col>
@@ -147,9 +135,6 @@ const SubscriptionCreateComponent = (props) => {
           </Col>
           <Col>
             {errors.value && <span className="errortext">This field is required</span>}
-          </Col>
-          <Col>
-            {errors.url && <span className="errortext">This field is required</span>}
           </Col>
         </Row>
         <Row>
