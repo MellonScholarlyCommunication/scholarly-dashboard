@@ -2,6 +2,7 @@
   "name": "mellon",
   "version": "1.2.0",
   "private": true,
+  "homepage": "http://mellonscholarlycommunication.github.io/scholarly-browser",
   "dependencies": {
     "@dexagod/ldn-agent": "^1.0.2",
     "@dexagod/rdf-retrieval": "^1.0.2",
