@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/scholarly-browser/static/css/main.cb09ae0d.chunk.css",
+    "main.js": "/scholarly-browser/static/js/main.b46208d9.chunk.js",
+    "main.js.map": "/scholarly-browser/static/js/main.b46208d9.chunk.js.map",
+    "runtime-main.js": "/scholarly-browser/static/js/runtime-main.6524ae0b.js",
+    "runtime-main.js.map": "/scholarly-browser/static/js/runtime-main.6524ae0b.js.map",
+    "static/css/2.ff645aaf.chunk.css": "/scholarly-browser/static/css/2.ff645aaf.chunk.css",
+    "static/js/2.4016c8ad.chunk.js": "/scholarly-browser/static/js/2.4016c8ad.chunk.js",
+    "static/js/2.4016c8ad.chunk.js.map": "/scholarly-browser/static/js/2.4016c8ad.chunk.js.map",
+    "index.html": "/scholarly-browser/index.html",
+    "precache-manifest.9b28281e64b14b3451ec6a7c6cae30d2.js": "/scholarly-browser/precache-manifest.9b28281e64b14b3451ec6a7c6cae30d2.js",
+    "service-worker.js": "/scholarly-browser/service-worker.js",
+    "static/css/2.ff645aaf.chunk.css.map": "/scholarly-browser/static/css/2.ff645aaf.chunk.css.map",
+    "static/css/main.cb09ae0d.chunk.css.map": "/scholarly-browser/static/css/main.cb09ae0d.chunk.css.map",
+    "static/js/2.4016c8ad.chunk.js.LICENSE.txt": "/scholarly-browser/static/js/2.4016c8ad.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6524ae0b.js",
+    "static/css/2.ff645aaf.chunk.css",
+    "static/js/2.4016c8ad.chunk.js",
+    "static/css/main.cb09ae0d.chunk.css",
+    "static/js/main.b46208d9.chunk.js"
+  ]
+}
