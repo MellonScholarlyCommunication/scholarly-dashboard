@@ -1,0 +1,173 @@
+import { FOAF, RDF, SCHEMA_INRUPT_EXT } from '@inrupt/lit-generated-vocab-common';
+import { Input, Textarea } from '@inrupt/prism-react-components';
+import { getUrlAll } from '@inrupt/solid-client';
+import { useSession, useThing } from '@inrupt/solid-ui-react';
+import { Button, Card, Container, Grid, Typography } from '@material-ui/core';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+
+import { postArtefactWithMetadata } from '../../utils/FileUtils';
+import { getBaseIRI } from '../../utils/util';
+import Modalify from '../modalify';
+import { ProfileCard } from '../profile';
+
+
+const ARTEFACTTYPE = "https://example.com/Artefact"
+
+function UploadComponent(props) {
+  const { session } = useSession();
+  const { webId } = session.info;
+  const defaultlocation = webId ? getBaseIRI(webId) + 'scholar/' : null
+  const router = useRouter()
+
+  const { register, handleSubmit, control } = useForm({ defaultValues: {
+    file: null,
+    title: null,
+    language: "en",
+    abstract: null,
+    location: defaultlocation,
+  } })
+
+  const {
+    fields: authorsfields,
+    append: authorsappend,
+    remove: authorsremove
+  } = useFieldArray({ control, name: "authors" });
+
+  if (authorsfields.length === 0) authorsappend({webId: ''});
+
+  const onSubmit = async (submission) => {
+    
+    submission.type = ARTEFACTTYPE;
+    submission.format = submission.file[0].type
+    // setting file to first file of fileList
+    submission.file = submission.file && submission.file.length && submission.file[0]
+
+    // Check and set necessary routes
+
+
+    // Post upload to data pod
+    let locations = await postArtefactWithMetadata(session.fetch, webId, submission)
+    
+    router.push({
+      pathname: '/',
+      query: { uri: locations.resourceMapURI },
+    })
+  }
+
+  const ProfileCheck = ({control, index}) => {
+    const value = useWatch({
+      control,
+      name: `authors[${index}].webId`
+    })
+    
+    const { thing, error } = useThing(value, value);
+    
+    let types, person, artefact
+    if (thing) {
+      types = getUrlAll(thing, RDF.type)
+      person = types.indexOf(FOAF.Person.value) !== -1 || types.indexOf(SCHEMA_INRUPT_EXT.Person.value) !== -1
+    }
+    
+    return (
+      person
+      ? Modalify(ProfileCard, {uri: value}, "View Profile")
+      :<div>{"Invalid profile"}</div>
+    )
+  }
+
+  return (
+    <Container fixed>
+      <Card style={{paddingLeft: "1%"}} >
+          <Typography> Upload </Typography>
+      </Card>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card style={{paddingLeft: "5%"}}>
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <input {...register('file')} type="file" name="file" />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="title"
+                control={control}
+                defaultValue=""
+                render={({ field }) => <Input label="Title" type="text" style={{width: "100%"}} {...field}/>}
+              />
+            </Grid>
+
+            { authorsfields.map(({ webId }, index) => { return(
+                <Controller
+                  key={"author"+index}
+                  name={`authors[${index}].webId`}
+                  control={control}
+                  defaultValue={webId || ""}
+                  render={({ field }) => {return (
+                  <Grid container>
+                    <Grid item xs={12} key={"profile" + index}>
+                      <Input label="Author" type="text" style={{width: "100%"}} {...field}/>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <ProfileCheck control={control} index={index}/>
+                    </Grid>
+                    {index === authorsfields.length - 1 && 
+                      <Grid item xs={2} key={"profileremove" + index} >
+                        <Button type="button" onClick={() => authorsremove({index})}> Remove </Button>
+                      </Grid> 
+                    }
+                    {index === authorsfields.length - 1 && 
+                      <Grid item xs={2} >
+                        <Button type="button" onClick={() => authorsappend({webId:''})}> Add </Button>
+                      </Grid>
+                    }
+                  </Grid>
+                  )}}
+                />
+            )})}
+            
+            <Grid item xs={12}>
+              <Controller
+                name="abstract"
+                control={control}
+                defaultValue=""
+                render={({ field }) => <Textarea label="Abstract" type="text" style={{width: "100%", height: "10em"}} {...field}/>}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="language"
+                control={control}
+                defaultValue="en"
+                render={({ field }) => <Input label="Language code" type="text" style={{width: "100%"}} {...field}/>}
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Controller
+                name="location"
+                control={control}
+                defaultValue=""
+                render={({ field }) => <Input label="Storage location" type="text" style={{width: "100%"}} {...field}/>}
+              />
+            </Grid>
+
+            <Grid item xs={5} />
+            <Grid item xs={2} >
+              <Button variant="outlined" type="submit" > Submit </Button>
+            </Grid>
+            <Grid item xs={5} />
+            <Grid item xs={12} />
+            <Grid item xs={12} />
+
+          </Grid>
+        </Card>
+      </form>
+    
+    </Container>
+  );
+}
+
+export default UploadComponent;
