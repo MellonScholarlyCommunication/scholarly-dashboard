@@ -3,8 +3,10 @@ import { generateArtefactResourceDescription, generateArtefactMetadata, generate
 import { SOLID } from "@inrupt/vocab-solid"
 import { RDF } from "@inrupt/vocab-common-rdf";
 import { AS, DCTERMS } from "@inrupt/lit-generated-vocab-common";
-import { getBaseIRI, NS_DCMI, NS_ORE } from "./util";
+import { getBaseIRI, getQuadsFromDataset, NS_DCMI, NS_ORE } from "./util";
 import { createNotification, sendNotification } from "./NotificationUtils";
+import DataFactory from "@rdfjs/data-model";
+import rdfSerializer from "rdf-serialize";
 
 export const LINKTYPE = NS_ORE+"ResourceMap"
 
@@ -21,15 +23,14 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   data.resourceURI = fileLocation
 
   const artefactResourceDescription = generateArtefactResourceDescription(webId, data)
-  const artefactFileSubmitted = await saveSolidDatasetInContainer(
-    data.location,
-    artefactResourceDescription,
-    { fetch: fetchFunc }             // fetch from authenticated Session
-  );
+  // const artefactFileSubmitted = await saveSolidDatasetInContainer(
+  //   data.location,
+  //   artefactResourceDescription,
+  //   { fetch: fetchFunc }             // fetch from authenticated Session
+  // );
 
-  let resourceDescriptionSourceURL = getSourceUrl(artefactFileSubmitted)
-  let thingRetrieved = getThing(artefactFileSubmitted, resourceDescriptionSourceURL+"#resourceMap")
-  let resourceMapLocation = thingRetrieved.url
+  const response = await postDatasetAtURLWithDefaultThing(fetchFunc, artefactResourceDescription, data.location, 'resourceMap', 'text/turtle')
+  const resourceMapLocation = response.headers.get('Location')
 
   if (resourceMapLocation) {
     // Update type index
@@ -38,14 +39,36 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   }
 
   // Send Notification
-  let notificationData = {type: AS.Create, actor: webId, object: resourceMapLocation, target: webId}
+  let notificationData = {type: AS.Create, actor: webId, object: resourceMapLocation}
   let notificationDataset = await createNotification(notificationData)
-  sendNotification(fetchFunc, notificationDataset, notificationData.target)
+  sendNotification(fetchFunc, webId, notificationDataset)
   
   return {fileId: fileLocation, resourceMapURI: resourceMapLocation}
 
 }
 
+const defaultNamePrefix = "https://inrupt.com/.well-known/sdk-local-node/"
+const streamifyArray = require('streamify-array');
+const stringifyStream = require('stream-to-string');
+export async function postDatasetAtURLWithDefaultThing(fetchFunction, dataset, containerURL, defaultName, contentType) {
+  let datasetQuads = getQuadsFromDataset(dataset)
+  // Process quads to map default URL on the url of the to be posted thing
+  let defaultNamedNode = DataFactory.namedNode('')
+  defaultName = defaultNamePrefix + defaultName
+  datasetQuads = datasetQuads.map(q => {
+    if (q.subject.value ==  defaultName) q.subject = defaultNamedNode;
+    if (q.object.value === defaultName) q.object = defaultNamedNode;
+    return(q);
+  })
+  const quadStream = streamifyArray(datasetQuads);
+  const textStream = rdfSerializer.serialize(quadStream, { contentType: contentType });
+  const stringRepresentation = await stringifyStream(textStream);
+  return await fetchFunction(containerURL,{
+    method: 'POST',
+    headers: {'Content-Type': contentType},
+    body: stringRepresentation,
+  })
+}
 
 export async function createFolderRecursive(folderURI, fetchFunction) {
   if(!folderURI) return

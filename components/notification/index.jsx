@@ -1,15 +1,12 @@
-import { Card, CardContent, Grid, Typography, Switch } from "@material-ui/core"
-import {useState, useEffect} from "react"
+import { Card, CardContent, Grid, Typography, Container } from "@material-ui/core"
 import { AS, DCTERMS, RDF } from "@inrupt/vocab-common-rdf";
 import { useForm } from "react-hook-form";
-import { CombinedDataProvider, useSession, useThing, Value } from "@inrupt/solid-ui-react";
+import { useSession, useThing } from "@inrupt/solid-ui-react";
 import { useArtefacts } from "../../hooks/useArtefacts";
-import { asUrl, getStringNoLocale, getUrl } from "@inrupt/solid-client";
-import { Container, Label } from "@inrupt/prism-react-components"
+import { getStringNoLocale, getUrl } from "@inrupt/solid-client";
 import { createNotification, sendNotification } from "../../utils/NotificationUtils";
 import useNotifications from "../../hooks/useNotifications";
 
-let targets = ["https://service1/card#me", "https://service2/card#me"]
 
 export function NotificationView(props) {
   let notificationIds = useNotifications()
@@ -84,7 +81,7 @@ export function CreateNotificationView() {
     data.actor = webId
 
     const notificationDataset = await createNotification(data)
-    await sendNotification(session.fetch, notificationDataset, data.target)
+    await sendNotification(session.fetch, webId, notificationDataset)
   }
 
   return (

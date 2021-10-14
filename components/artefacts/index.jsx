@@ -103,58 +103,52 @@ function ArtefactViewComponent(props) {
 
       <CombinedDataProvider datasetUrl={artefactId} thingUrl={artefactId}>
         <Card style={{padding: "5px", whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>
-          <Typography gutterBottom variant="h5" component="h3">
-            {metadata.resourceMap.title}
-          </Typography>
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h3">
+              ResourceMap
+            </Typography>
 
-          {createCardContent("Title", <Value property={DCTERMS.title} thing={metadata.resourceMap} dataType="string"/>)}
-          {createCardContent("Created", <Value property={DCTERMS.created} thing={metadata.resourceMap} dataType="datetime"/>)}
-          {createCardContent("Modified", <Value property={DCTERMS.modified} thing={metadata.resourceMap} dataType="datetime"/>)}
-          {createCardContent("Publisher", multiValueGrid(getUrlAll(metadata.resourceMap, DCTERMS.publisher).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
-          {createCardContent("Author", multiValueGrid(getUrlAll(metadata.resourceMap, DCTERMS.creator).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
+            {createCardContent("Title", <Value property={DCTERMS.title} thing={metadata.resourceMap} dataType="string"/>)}
+            {createCardContent("Created", <Value property={DCTERMS.created} thing={metadata.resourceMap} dataType="datetime"/>)}
+            {createCardContent("Modified", <Value property={DCTERMS.modified} thing={metadata.resourceMap} dataType="datetime"/>)}
+            {createCardContent("Publisher", multiValueGrid(getUrlAll(metadata.resourceMap, DCTERMS.publisher).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
+            {createCardContent("Author", multiValueGrid(getUrlAll(metadata.resourceMap, DCTERMS.creator).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
 
-          <Typography gutterBottom variant="h5" component="h3">
-            Aggregation
-          </Typography>
+            <hr></hr>
+            <Typography gutterBottom variant="h5" component="h3">
+              Aggregation
+            </Typography>
 
-          {createCardContent("Publisher", multiValueGrid(getUrlAll(metadata.aggregation, DCTERMS.publisher).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
-          {createCardContent("Author", multiValueGrid(getUrlAll(metadata.aggregation, DCTERMS.creator).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
-          {createCardContent("Title", <Value property={DCTERMS.abstract_} thing={metadata.aggregation} dataType="string"/>)}
+            {createCardContent("Publisher", multiValueGrid(getUrlAll(metadata.aggregation, DCTERMS.publisher).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
+            {createCardContent("Author", multiValueGrid(getUrlAll(metadata.aggregation, DCTERMS.creator).map(webId => getRemoteValueLink(webId, VCARD.fn))))}
+            {createCardContent("Title", <Value property={DCTERMS.abstract_} thing={metadata.aggregation} dataType="string"/>)}
 
-          <hr></hr>
-          <Grid container spacing={2}>
-          {metadata.instances.map(instanceThing => {
-            return(
-              <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Card>
-                  <Typography gutterBottom variant="h3" component="h3">
-                    <Value property={DCTERMS.title} thing={instanceThing} dataType="string"/>
-                  </Typography>
-                  
-                  <Value property={NS_DCMI+"format"} thing={instanceThing} dataType="string"/>
+            <hr></hr>
+            <Grid container spacing={2}>
+            {metadata.instances.map(instanceThing => {
+              return(
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Card>
+                    <Typography gutterBottom variant="h3" component="h3">
+                      <a href={instanceThing.url}><Value property={DCTERMS.title} thing={instanceThing} dataType="string"/></a>
+                    </Typography>
+                    {createCardContent("Format", <Value property={NS_DCMI+"format"} thing={instanceThing} dataType="string"/>, 6)}
+                    {createCardContent("Language", <Value property={DCTERMS.language} thing={instanceThing} dataType="string"/>, 6)}
+                    <Button onClick={() => window.open(instanceThing.url)}>Open</Button>
+                  </Card>
+                </Grid>
+              )
+            })}
+            </Grid>
 
-                  {createCardContent("Format", <Value property={DCTERMS.language} thing={instanceThing} dataType="string"/>, 6)}
-                  {createCardContent("Language", <Value property={DCTERMS.language} thing={instanceThing} dataType="string"/>, 6)}
-                  <Button onClick={() => window.open(instanceThing.url)}>Open</Button>
-                </Card>
-              </Grid>
-            )
-          })}
-          </Grid>
-          
-
-
-
-          {webId && 
-            <CardContent>
-              <Typography gutterBottom variant="h6" component="h3">
-                Events
-              </Typography>
+            <hr></hr>
+            <Typography gutterBottom variant="h5" component="h3">
+              Events
+            </Typography>
+            {webId && 
               <EventListingComponent target={webId} artefactId={artefactId} /> 
-            </CardContent>
-          }
-
-          
+            }
+          </CardContent>
         </Card>
       </CombinedDataProvider>
     }

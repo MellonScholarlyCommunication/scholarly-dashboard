@@ -27,7 +27,7 @@ function InstantiationWrapper(props) {
   }, [webId])
 
   function onSuccess() {
-    setInitialize(false)
+    setInitialized(true)
   }
 
   return (
