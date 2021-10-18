@@ -28,13 +28,6 @@ import {
 import { useBem } from "@solid/lit-prism-patterns";
 import Link from "next/link";
 
-import { useRouter } from 'next/router'
-
-import IconButton from '@material-ui/core/IconButton';
-import PersonIcon from '@material-ui/icons/Person';
-import PublishIcon from '@material-ui/icons/Publish';
-import MailIcon from '@material-ui/icons/Mail';
-
 import { useSession, LogoutButton } from "@inrupt/solid-ui-react";
 import LoginForm from "../loginForm";
 import styles from "./styles";
@@ -43,16 +36,18 @@ const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 export const TESTCAFE_ID_HEADER_LOGO = "header-banner-logo";
 
-export default function Header(props) {
+export default function Header() {
   const { session, sessionRequestInProgress } = useSession();
   const { webId } = session.info;
-  const router = useRouter()
 
   const bem = useBem(useStyles());
   const classes = useStyles();
 
   return (
-    <header className={bem("header-banner")} style={{position: "fixed", width: "100vw"}}>
+    <header
+      className={bem("header-banner")}
+      style={{ position: "fixed", width: "100vw" }}
+    >
       <div className={classes.logoContainer}>
         <Link href="/">
           <a data-testid={TESTCAFE_ID_HEADER_LOGO}>
@@ -66,8 +61,13 @@ export default function Header(props) {
         </Link>
       </div>
 
-      <div className={bem("header-banner__main-nav")} style={{ display: "flex", alignItems: "center"}}>
-        {webId && <label style={{marginLeft: "auto"}}>Logged in as: {webId}</label>}
+      <div
+        className={bem("header-banner__main-nav")}
+        style={{ display: "flex", alignItems: "center" }}
+      >
+        {webId && (
+          <label style={{ marginLeft: "auto" }}>Logged in as: {webId}</label>
+        )}
       </div>
       <div className={bem("user-menu")}>
         {!sessionRequestInProgress && session.info.isLoggedIn && (

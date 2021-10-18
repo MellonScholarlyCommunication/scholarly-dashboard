@@ -1,9 +1,9 @@
-import ContentContainer from "../components/contentContainer"
+import ContentContainer from "../components/contentContainer";
 
 export default function Home() {
   return (
     <div>
-      <ContentContainer></ContentContainer>
+      <ContentContainer />
     </div>
   );
 }

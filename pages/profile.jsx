@@ -1,12 +1,14 @@
-import "react"
+import React from "react";
 import { LoginRequestWrapper } from "../components/error";
-import ProfileView, {ProfileCard} from "../components/profile";
-
+import { ProfileCard } from "../components/profile";
 
 export default function Home() {
   return (
     <div>
-      <LoginRequestWrapper component={<ProfileCard editable={true}/> } view="Profile" />
+      <LoginRequestWrapper
+        component={<ProfileCard editable />}
+        view="Profile"
+      />
     </div>
   );
 }

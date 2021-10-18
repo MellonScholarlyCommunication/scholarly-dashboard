@@ -33,7 +33,7 @@ const styles = (theme) =>
     confirmButton: {
       height: "4em",
       width: "100%",
-    }
+    },
   });
 
 export default styles;

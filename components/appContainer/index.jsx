@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /**
  * Copyright 2021 Inrupt Inc.
  *
@@ -32,19 +33,16 @@ import {
   makeStyles,
   StylesProvider,
   ThemeProvider,
-  PageHeader,
-  Container,
 } from "@inrupt/prism-react-components";
 
 import {
-  handleIncomingRedirect, 
-  onSessionRestore
+  handleIncomingRedirect,
+  onSessionRestore,
 } from "@inrupt/solid-client-authn-browser";
 
-import { useState, useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useRouter } from 'next/router'
-
+import { useRouter } from "next/router";
 
 import { SessionProvider, useSession } from "@inrupt/solid-ui-react";
 
@@ -52,11 +50,8 @@ import Header from "../header";
 import Nav from "../nav";
 import Footer from "../footer";
 
-import config from "../../config";
 import theme from "../../src/theme";
 import MyDrawer from "./drawer";
-
-const CONFIG = config();
 
 const jss = create(preset());
 const useStyles = makeStyles(() => createStyles(appLayout.styles(theme)));
@@ -68,46 +63,50 @@ function AppContainer(props) {
   const { session } = useSession();
 
   // Fix for solid fetch not invocating on window
-  useEffect(() => { 
-    const authFetch = session.fetch
-    const browserFetch = window.fetch.bind(window) 
-    session.fetch = function(...args) {
-      const { webId } = session.info;    
-      if (webId) return authFetch(...args)
-      else return browserFetch(...args)
-    } 
-  }, []);
+  useEffect(() => {
+    const authFetch = session.fetch;
+    const browserFetch = window.fetch.bind(window);
+    session.fetch = function (...args) {
+      const { webId } = session.info;
+      if (webId) return authFetch(...args);
+      return browserFetch(...args);
+    };
+  }, [session]);
 
   const router = useRouter();
 
   // 1. Register the callback to restore the user's page after refresh and
   //    redirection from the Solid Identity Provider.
   onSessionRestore((url) => {
-    router.push(url)
+    router.push(url);
   });
 
   useEffect(() => {
     // 2. When loading the component, call `handleIncomingRedirect` to authenticate
     //    the user if appropriate, or to restore a previous session.
     handleIncomingRedirect({
-      restorePreviousSession: true
+      restorePreviousSession: true,
     }).then((info) => {
-      console.log(`Logged in with WebID [${info && info.webId}]`)
-    })
+      // eslint-disable-next-line no-console
+      console.log(`Logged in with WebID [${info && info.webId}]`);
+    });
   }, []);
 
   return (
-    <SessionProvider restorePreviousSession={true} session={session} >
+    <SessionProvider restorePreviousSession session={session}>
       <StylesProvider jss={jss}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
 
           <div className={bem("app-layout")}>
-            <Header/>
-            <Nav/>
+            <Header />
+            <Nav />
 
-            <main className={bem("app-layout__main")} style={{padding: "15px"}} >
-              <MyDrawer {...props}/>
+            <main
+              className={bem("app-layout__main")}
+              style={{ padding: "15px" }}
+            >
+              <MyDrawer {...props} />
             </main>
 
             <Footer />

@@ -1,11 +1,14 @@
-import "react"
+import React from "react";
 import { LoginRequestWrapper } from "../../components/error";
 import { CreateNotificationView } from "../../components/notification";
 
 export default function Home() {
   return (
     <div>
-      <LoginRequestWrapper component={<CreateNotificationView />} view="Create Notification" />
+      <LoginRequestWrapper
+        component={<CreateNotificationView />}
+        view="Create Notification"
+      />
     </div>
   );
 }

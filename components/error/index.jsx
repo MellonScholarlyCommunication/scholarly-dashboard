@@ -1,33 +1,34 @@
-import { useSession } from "@inrupt/solid-ui-react"
-import "react"
-
+import React from "react";
+import { useSession } from "@inrupt/solid-ui-react";
 
 export default function ErrorComponent(props) {
-  
-
-  return(
+  const { message, uri } = props;
+  return (
     <div>
       <label>
-        The requested resource at {props.uri} could not be retrieved: {props.message || "Unknown error"}
+        The requested resource at {uri} could not be retrieved:
+        {message || "Unknown error"}
       </label>
     </div>
-  )
+  );
 }
-
 
 export function LoginRequestWrapper(props) {
   const { session } = useSession();
-  const { webId, isLoggedIn } = session.info;
+  const { isLoggedIn } = session.info;
+  const { component, view } = props;
 
-  console.log('isloggedIn', isLoggedIn, props)
-
-  return (
-    isLoggedIn
-    ? props.component
-    : <div>
-        <label>
-            {`${props.view ? `The ${props.view} view is only available` : "This action is only possible"} when logged in with Solid. Please login at the top right of the screen.`}
-        </label>
-      </div>
-  )
+  return isLoggedIn ? (
+    component
+  ) : (
+    <div>
+      <label>
+        {`${
+          view
+            ? `The ${view} view is only available`
+            : "This action is only possible"
+        } when logged in with Solid. Please login at the top right of the screen.`}
+      </label>
+    </div>
+  );
 }

@@ -19,57 +19,48 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
- import { useEffect, useState } from "react";
+import { useState } from "react";
 
- import {
-   useSession,
-   CombinedDataProvider,
-   Image,
-   Text,
-   Value,
-   Link
- } from "@inrupt/solid-ui-react";
- 
- import {
-   Button,
-   Card,
-   CardActions,
-   CardActionArea,
-   CardContent,
-   Container,
-   Grid,
-   Avatar,
-   Typography,
-   Accordion,
-   AccordionSummary,
-   AccordionDetails,
- } from "@material-ui/core";
+import {
+  useSession,
+  CombinedDataProvider,
+  Text,
+  Value,
+} from "@inrupt/solid-ui-react";
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'; 
+import {
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Grid,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@material-ui/core";
+
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import BusinessIcon from "@material-ui/icons/Business";
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import MessageIcon from '@mui/icons-material/Message';
+import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
+import MessageIcon from "@mui/icons-material/Message";
 
-import { FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
+import { VCARD } from "@inrupt/lit-generated-vocab-common";
 
-import ContactTable from "../contactTable";
-import BirthdateRow from "../birthdateRow";
 import { ArtefactListingComponent } from "../artefacts";
 import { EventListingComponent } from "../eventLog";
 import ProfileAvatar from "./avatar";
-import MultiValue from "./multiValue";
-
 
 /**
  * fn -> full name
  * hasPhoto
  * bday
  * hasGender
- * 
+ *
  * title
  * email
- * 
+ *
  * hasTelephone
  * hasEmail
  * hasInstantMessage
@@ -79,17 +70,15 @@ import MultiValue from "./multiValue";
 export default function ProfileView(props) {
   const { session } = useSession();
   const { webId } = session.info;
-  const [editing, setEditing] = useState(false);
-  const target = props.uri || webId
-  const editable = webId && target === webId
-  const maxWidth = props.maxWidth || "100%"
+  const { uri, maxWidth } = props;
+  const target = uri || webId;
+  const width = maxWidth || "100%";
 
   return (
     <Container fixed>
       <CombinedDataProvider datasetUrl={target} thingUrl={target}>
-        <Card style={{ maxWidth: maxWidth}}>
-          
-        <Accordion defaultExpanded={true}>
+        <Card style={{ width }}>
+          <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -98,11 +87,11 @@ export default function ProfileView(props) {
               <Typography>Profile</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <ProfileCard uri={target} editable={true}/>
+              <ProfileCard uri={target} editable />
             </AccordionDetails>
           </Accordion>
 
-          <Accordion TransitionProps={{mountOnEnter: true}}>
+          <Accordion TransitionProps={{ mountOnEnter: true }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -114,7 +103,7 @@ export default function ProfileView(props) {
               <ArtefactListingComponent target={target} />
             </AccordionDetails>
           </Accordion>
-          <Accordion TransitionProps={{mountOnEnter: true}}>
+          <Accordion TransitionProps={{ mountOnEnter: true }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel2a-content"
@@ -132,28 +121,28 @@ export default function ProfileView(props) {
   );
 }
 
-
-
-
 export function ProfileCard(props) {
   const { session } = useSession();
   const { webId } = session.info;
+  const { uri, maxWidth, editable } = props;
   const [edit, setEdit] = useState(false);
-  const target = props.uri || webId;
-  const maxWidth = props.maxWidth || "100%";
+  const target = uri || webId;
+  const width = maxWidth || "100%";
 
   return (
     <CombinedDataProvider datasetUrl={target} thingUrl={target}>
-      <Card style={{ maxWidth: maxWidth}}>
+      <Card style={{ width }}>
         <Grid container spacing={2} justify="center">
           <Grid item xs={12} sm={9}>
-
             <CardContent>
               <Typography gutterBottom variant="h2" component="h2">
                 <Text property={VCARD.fn} edit={edit} autosave />
               </Typography>
 
-              <Typography variant="body2" color="textSecondary" component="p"
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -161,8 +150,11 @@ export function ProfileCard(props) {
               >
                 <Text property={VCARD.title} edit={edit} autosave />
               </Typography>
-              
-              <Typography variant="body2" color="textSecondary" component="p"
+
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -172,8 +164,10 @@ export function ProfileCard(props) {
                 <Text property={VCARD.organization_name} edit={edit} autosave />
               </Typography>
 
-
-              <Typography variant="body2" color="textSecondary" component="p"
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -183,7 +177,10 @@ export function ProfileCard(props) {
                 <Text property={VCARD.hasTelephone} edit={edit} autosave />
               </Typography>
 
-              <Typography variant="body2" color="textSecondary" component="p"
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -193,20 +190,24 @@ export function ProfileCard(props) {
                 <Text property={VCARD.hasEmail} edit={edit} autosave />
               </Typography>
 
-
-              <Typography variant="body2" color="textSecondary" component="p"
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
                 style={{
                   display: "flex",
                   alignItems: "center",
                 }}
               >
                 <MessageIcon />
-                <Value property={VCARD.hasInstantMessage} edit={edit} autosave onError={() => {}} dataType="url" />
+                <Value
+                  property={VCARD.hasInstantMessage}
+                  edit={edit}
+                  autosave
+                  onError={() => {}}
+                  dataType="url"
+                />
               </Typography>
-
-
-              {/* <MultiValue property={VCARD.hasInstantMessage} edit={edit} autosave /> */}
-
 
               <Typography
                 variant="body2"
@@ -216,20 +217,23 @@ export function ProfileCard(props) {
                   display: "flex",
                   alignItems: "baseline",
                 }}
-              >
-              </Typography>
+              />
             </CardContent>
 
-            {props.editable && webId && target === webId && 
-            <Button onClick={() => setEdit(!edit)}>
-              {edit ? "Finish editing profile" : "Edit Profile information"}
-            </Button>
-            }
-
+            {editable && webId && target === webId && (
+              <Button onClick={() => setEdit(!edit)}>
+                {edit ? "Finish editing profile" : "Edit Profile information"}
+              </Button>
+            )}
           </Grid>
           <Grid item xs={12} sm={3}>
             <CardContent>
-              <ProfileAvatar property={VCARD.hasPhoto} edit={edit} autosave size={"100%"}/>
+              <ProfileAvatar
+                property={VCARD.hasPhoto}
+                edit={edit}
+                autosave
+                size="100%"
+              />
             </CardContent>
           </Grid>
         </Grid>

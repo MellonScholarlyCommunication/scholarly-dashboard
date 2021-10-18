@@ -36,7 +36,6 @@ export default class MyDocument extends NextDocument {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Raleway:400,700|Roboto:300,400,700&amp;display=swap"
           />
-          
         </Head>
         <body>
           <Main />

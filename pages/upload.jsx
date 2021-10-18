@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react"
-import UploadContainer from "../components/upload"
-import { LoginRequestWrapper } from "../components/error";
+import { useEffect } from "react";
 import { useSession } from "@inrupt/solid-ui-react";
-import { isInitialized } from "../components/settings"
 import { useRouter } from "next/router";
+import UploadContainer from "../components/upload";
+import { LoginRequestWrapper } from "../components/error";
+import { isInitialized } from "../components/settings";
 
 export default function Home() {
   return (
     <div>
-      <LoginRequestWrapper component={<InstantiationWrapper component={<UploadContainer />} />} view="Upload" />
+      <LoginRequestWrapper
+        component={<InstantiationWrapper component={<UploadContainer />} />}
+        view="Upload"
+      />
     </div>
   );
 }
@@ -16,25 +19,23 @@ export default function Home() {
 function InstantiationWrapper(props) {
   const { session } = useSession();
   const { webId } = session.info;
-  const Component = props.component
-  const router = useRouter()
+  const Component = props.component;
+  const router = useRouter();
 
   useEffect(() => {
     if (!webId) return;
-    let running = true
     async function check() {
-      let initialized = await isInitialized(session)
-      if(running && !initialized) {
-        alert('Please complete your data pod settings.')
+      const initialized = await isInitialized(session);
+      if (!initialized) {
         router.push({
-          pathname: '/settings',
-          query: { edit: true},
-        })
+          pathname: "/settings",
+          query: { edit: true },
+          shallow: true,
+        });
       }
     }
-    check()
-    return () => { running = false }
-  }, [webId])
+    check();
+  }, [session, router, webId]);
 
-  return ( Component )
+  return Component;
 }

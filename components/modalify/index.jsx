@@ -1,25 +1,23 @@
-import { Button, Grid } from '@material-ui/core';
-import {useState} from 'react';
-import ReactDOM from 'react-dom';
-import Modal from 'react-modal';
+/* eslint-disable react/jsx-props-no-spreading */
+import { Button } from "@material-ui/core";
+import { useState } from "react";
+import Modal from "react-modal";
 
-Modal.setAppElement('body');
+Modal.setAppElement("body");
 
 const customStyles = {
   content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
   },
 };
 
-function ModalComponent (props) {
-  const Component = props.Component
-  const childProps = props.passedProps
-  const placeholder = props.placeholder
+function ModalComponent(props) {
+  const { passedProps, Component, placeholder } = props;
   const [modalIsOpen, setIsOpen] = useState(false);
 
   function openModal() {
@@ -34,24 +32,29 @@ function ModalComponent (props) {
     setIsOpen(false);
   }
 
-  return ( 
-    modalIsOpen 
-    ?  <Modal
-        isOpen={modalIsOpen}
-        onAfterOpen={afterOpenModal}
-        onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Popup"
-      >
-        <Component {...childProps} />
-      </Modal> 
-    : <Button onClick={openModal}>{placeholder || "View"}</Button>
-  )
+  return modalIsOpen ? (
+    <Modal
+      isOpen={modalIsOpen}
+      onAfterOpen={afterOpenModal}
+      onRequestClose={closeModal}
+      style={customStyles}
+      contentLabel="Popup"
+    >
+      <Component {...passedProps} />
+    </Modal>
+  ) : (
+    <Button onClick={openModal}>{placeholder || "View"}</Button>
+  );
 }
 
 function Modalify(Component, props, placeholder) {
-  return (<ModalComponent Component={Component} placeholder={placeholder} passedProps={props}></ModalComponent>)
+  return (
+    <ModalComponent
+      Component={Component}
+      placeholder={placeholder}
+      passedProps={props}
+    />
+  );
 }
 
-
-export default Modalify
+export default Modalify;
