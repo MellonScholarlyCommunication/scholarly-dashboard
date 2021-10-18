@@ -18,6 +18,10 @@ import {
 } from "@material-ui/core";
 import { useRouter } from "next/router";
 import { ORCHESTRATORPREDICATE } from "../../utils/util";
+import {
+  createFolderRecursiveIfNotExists,
+  createResourceIfNotExists,
+} from "../../utils/FileUtils";
 
 export function SettingsView() {
   const { session } = useSession();
@@ -31,6 +35,33 @@ export function SettingsView() {
 
   async function handleSubmit() {
     setEdit(!edit);
+    const thing = getThing(
+      await getSolidDataset(webId, { fetch: session.fetch }),
+      webId
+    );
+    const inboxUrl = getUrl(thing, LDP.inbox);
+    const outboxUrl = getUrl(thing, `${AS.NAMESPACE}outbox`);
+    const typeIndexUrl = getUrl(thing, SOLID.publicTypeIndex);
+
+    // Check if inbox exists and create if not.
+    if (inboxUrl) {
+      createFolderRecursiveIfNotExists(inboxUrl, session.fetch);
+    }
+
+    // Check if outbox exists and create if not.
+    if (outboxUrl) {
+      createFolderRecursiveIfNotExists(inboxUrl, session.fetch);
+    }
+
+    // Check if type index exists and create if not.
+    if (typeIndexUrl) {
+      const body = `
+      // @prefix : <#>.
+      // @prefix solid: <http://www.w3.org/ns/solid/terms#>.
+      // <> a solid:ListedDocument, solid:TypeIndex.`;
+      createResourceIfNotExists(inboxUrl, body, "text/turtle", session.fetch);
+    }
+
     //     let thing = getThing(await getSolidDataset(webId, {fetch: session.fetch}), webId)
     //     console.log('thing', thing, SOLID.publicTypeIndex)
     //     console.log('url', getUrlAll(thing, "http://www.w3.org/ns/solid/terms#publicTypeIndex"))
@@ -178,7 +209,6 @@ export function SettingsView() {
 
 export async function isInitialized(session) {
   if (!session) return false;
-  console.log("TEST", session, !!session, session.info);
   const { webId } = session.info;
   if (!webId) return false;
 
@@ -194,7 +224,6 @@ export async function isInitialized(session) {
   ];
 
   for (const property of requiredProperties) {
-    console.log("getting url", property);
     if (!getUrl(profileThing, property)) {
       return false;
     }
