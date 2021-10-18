@@ -28,8 +28,8 @@ import { Card, CardContent, Grid, Typography } from "@material-ui/core";
   return (
     <Grid container spacing={1}>
       { ids.map( id => 
-        <Grid item md={3} sm={6} xs={12}>
-          <EventCardComponent id={id} key={id} /> 
+        <Grid item md={3} sm={6} xs={12} key={"listingcard"+id} >
+          <EventCardComponent id={id} key={"cardcomponent"+id} /> 
         </Grid>
       )}
     </Grid>

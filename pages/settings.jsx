@@ -1,12 +1,12 @@
 import "react"
 import { LoginRequestWrapper } from "../components/error";
-import { NotificationView } from "../components/notification";
+import { SettingsView } from "../components/settings";
 
 
 export default function Home() {
   return (
     <div>
-      <LoginRequestWrapper component={<NotificationView/>} view="Notifications" />
+      <LoginRequestWrapper component={<SettingsView/>} view="Settings" />
     </div>
   );
 }

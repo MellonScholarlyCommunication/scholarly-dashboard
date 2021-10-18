@@ -52,7 +52,7 @@ export default function Header(props) {
   const classes = useStyles();
 
   return (
-    <header className={bem("header-banner")}>
+    <header className={bem("header-banner")} style={{position: "fixed", width: "100vw"}}>
       <div className={classes.logoContainer}>
         <Link href="/">
           <a data-testid={TESTCAFE_ID_HEADER_LOGO}>
@@ -66,51 +66,8 @@ export default function Header(props) {
         </Link>
       </div>
 
-      <div className={bem("header-banner__main-nav")} >
-        <IconButton 
-          onClick={() => {
-            router.push({
-              pathname: '/',
-              query: { uri: webId || '' },
-            })
-          }}>
-          <PersonIcon fontSize="large" />
-          <label style={{fontSize:"medium"}}>Browser</label>
-        </IconButton>
-        {webId && 
-          <IconButton 
-            onClick={() => {
-              router.push({
-                pathname: '/upload',
-              })
-            }}>
-            <PublishIcon fontSize="large" />
-            <label style={{fontSize:"medium"}}>Upload</label>
-          </IconButton>
-        }
-        {webId && 
-          <IconButton 
-            onClick={() => {
-              router.push({
-                pathname: '/notifications',
-              })
-            }}>
-              <MailIcon fontSize="large" />
-              <label style={{fontSize:"medium"}}>Notifications</label>
-            </IconButton>
-        }
-        {webId && 
-          <IconButton 
-            onClick={() => {
-              router.push({
-                pathname: '/notifications/create',
-              })
-            }}>
-              <MailIcon fontSize="large" />
-              <label style={{fontSize:"medium"}}>Create Notification</label>
-            </IconButton>
-        }
-        {webId && <label><small>Logged in as: {webId}</small></label>}
+      <div className={bem("header-banner__main-nav")} style={{ display: "flex", alignItems: "center"}}>
+        {webId && <label style={{marginLeft: "auto"}}>Logged in as: {webId}</label>}
       </div>
       <div className={bem("user-menu")}>
         {!sessionRequestInProgress && session.info.isLoggedIn && (

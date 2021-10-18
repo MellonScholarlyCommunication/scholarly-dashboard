@@ -185,7 +185,7 @@ export default function ContactTable({ edit, property }) {
               onChange={(e) => setNewContactType(e.target.value)}
             >
               {contactTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
+                <MenuItem key={option.value} value={option.value} key={"menuItem"+option.label}>
                   {option.label}
                 </MenuItem>
               ))}

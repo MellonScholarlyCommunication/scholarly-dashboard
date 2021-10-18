@@ -16,7 +16,7 @@ export function NotificationView(props) {
     <Container fixed> 
       <Grid container spacing={2}>
         {notificationIds.map(id => 
-          <Grid item md={4} sm={6} xs={12}> 
+          <Grid item md={4} sm={6} xs={12} key={"notification"+id}> 
             <NotificationCard target={id} /> 
           </Grid>
         )} 
@@ -80,7 +80,7 @@ export function CreateNotificationView() {
     if (!data.target) { alert("Please select a notification target"); return }
     data.actor = webId
 
-    const notificationDataset = await createNotification(data)
+    const notificationDataset = await createNotification(session.fetch, data)
     await sendNotification(session.fetch, webId, notificationDataset)
   }
 

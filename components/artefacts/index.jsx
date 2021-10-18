@@ -35,7 +35,7 @@ function ArtefactListingComponent(params) {
   return (
       <Grid container spacing={1}>
         { artefactIds.map( id => 
-          <Grid item md={3} sm={6} xs={12}>
+          <Grid item md={3} sm={6} xs={12} key={"artefactcard" + id}>
             <ArtefactCardComponent artefactId={id} /> 
           </Grid>
         )}
@@ -167,9 +167,9 @@ function getRemoteValue(thingUrl, property) {
 }
 
 
-function getRemoteValueLink(thingUrl, property) {
+function getRemoteValueLink(thingUrl, property, id=1) {
   return (
-    <DatasetProvider datasetUrl={thingUrl}>
+    <DatasetProvider datasetUrl={thingUrl} key={`remotevalue${proprety}${id}`}>
       <ThingProvider thingUrl={thingUrl}>
         <a href={thingUrl}> <Value property={property} /> </a>
       </ThingProvider>
@@ -196,7 +196,7 @@ function createCardContent(label, valueObjects, size=8) {
   )
 }
 
-function multiValueGrid(valueComponents) { return <Grid container spacing={1}> {valueComponents.map(vc => <Grid item xs={12}>{vc}</Grid>)} </Grid> }
+function multiValueGrid(valueComponents) { return <Grid container spacing={1}> {valueComponents.map(vc => <Grid item xs={12} key={"valuecomponent" + vc}>{vc}</Grid>)} </Grid> }
 
 function getFormatString(value) {
   if(!value || !value.length) return ""

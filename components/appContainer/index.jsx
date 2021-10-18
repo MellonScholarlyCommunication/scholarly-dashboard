@@ -54,6 +54,7 @@ import Footer from "../footer";
 
 import config from "../../config";
 import theme from "../../src/theme";
+import MyDrawer from "./drawer";
 
 const CONFIG = config();
 
@@ -61,7 +62,7 @@ const jss = create(preset());
 const useStyles = makeStyles(() => createStyles(appLayout.styles(theme)));
 
 /* eslint react/prop-types: 0 */
-function AppContainer({ children }) {
+function AppContainer(props) {
   const bem = useBem(useStyles());
 
   const { session } = useSession();
@@ -106,7 +107,7 @@ function AppContainer({ children }) {
             <Nav/>
 
             <main className={bem("app-layout__main")} style={{padding: "15px"}} >
-              <Container>{children}</Container>
+              <MyDrawer {...props}/>
             </main>
 
             <Footer />

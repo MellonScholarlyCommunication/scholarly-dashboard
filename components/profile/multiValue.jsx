@@ -25,7 +25,7 @@ export default function MultiValue(props) {
   return (
     <div>
       {values.map(v => 
-        <Typography variant="body2" color="textSecondary" component="p"
+        <Typography variant="body2" color="textSecondary" component="p" key={"value"+v}
           style={{
             display: "flex",
             alignItems: "center",

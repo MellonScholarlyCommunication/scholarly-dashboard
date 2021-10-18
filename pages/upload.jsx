@@ -2,12 +2,13 @@ import { useState, useEffect } from "react"
 import UploadContainer from "../components/upload"
 import { LoginRequestWrapper } from "../components/error";
 import { useSession } from "@inrupt/solid-ui-react";
-import { checkRequiredProfileLinks, InitializationView } from "../components/initialization";
+import { isInitialized } from "../components/settings"
+import { useRouter } from "next/router";
 
 export default function Home() {
   return (
     <div>
-      <LoginRequestWrapper component={<InstantiationWrapper component={<UploadContainer />} />} />
+      <LoginRequestWrapper component={<InstantiationWrapper component={<UploadContainer />} />} view="Upload" />
     </div>
   );
 }
@@ -16,23 +17,24 @@ function InstantiationWrapper(props) {
   const { session } = useSession();
   const { webId } = session.info;
   const Component = props.component
-
-  const [initialized, setInitialized] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (!webId) return;
     let running = true
-    checkRequiredProfileLinks(session.fetch, webId).then(bool => { console.log('bool', bool); if (running) setInitialized(bool) })
+    async function check() {
+      let initialized = await isInitialized(session)
+      if(running && !initialized) {
+        alert('Please complete your data pod settings.')
+        router.push({
+          pathname: '/settings',
+          query: { edit: true},
+        })
+      }
+    }
+    check()
     return () => { running = false }
   }, [webId])
 
-  function onSuccess() {
-    setInitialized(true)
-  }
-
-  return (
-    initialized 
-      ? Component
-      : <InitializationView onSuccess={onSuccess}/>
-  )
+  return ( Component )
 }

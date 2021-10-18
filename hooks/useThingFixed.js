@@ -1,7 +1,6 @@
 import { getSolidDataset, getThing } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState, useEffect } from "react";
-import useFetch from "./useFetch";
 
 function useThingFixed(thingURI) {
   const [thing, setThing] = useState(undefined)
@@ -12,13 +11,12 @@ function useThingFixed(thingURI) {
   useEffect(() => {
     if (!thingURI) return;
 
-    const fetch = useFetch()
 
     async function fetchDataset(fetch) {
       try {
         const dataset = await getSolidDataset(
           thingURI,
-          { fetch: fetch }          // fetch from authenticated session
+          { fetch: session.fetch }          // fetch from authenticated session
         ); 
         setThing(getThing(dataset, thingURI))
       } catch (error) {

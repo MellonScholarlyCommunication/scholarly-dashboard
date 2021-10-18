@@ -26,7 +26,7 @@ export function LoginRequestWrapper(props) {
     ? props.component
     : <div>
         <label>
-          This action is only possible when logged in with Solid. Please login at the top right of the screen.
+            {`${props.view ? `The ${props.view} view is only available` : "This action is only possible"} when logged in with Solid. Please login at the top right of the screen.`}
         </label>
       </div>
   )

@@ -50,3 +50,13 @@ body,
   height: 100%;
   /* background-color: rgb(234, 238, 243) */
 }
+
+/* Additions to make things work */
+
+.valueParent > input {
+  width: 85%;
+}
+
+#drawer > div {
+  overflow-y: scroll;
+}

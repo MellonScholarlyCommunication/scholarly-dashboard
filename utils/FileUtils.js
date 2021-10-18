@@ -40,7 +40,7 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
 
   // Send Notification
   let notificationData = {type: AS.Create, actor: webId, object: resourceMapLocation}
-  let notificationDataset = await createNotification(notificationData)
+  let notificationDataset = await createNotification(fetchFunc, notificationData)
   sendNotification(fetchFunc, webId, notificationDataset)
   
   return {fileId: fileLocation, resourceMapURI: resourceMapLocation}

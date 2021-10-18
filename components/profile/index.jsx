@@ -80,7 +80,7 @@ export default function ProfileView(props) {
   const { session } = useSession();
   const { webId } = session.info;
   const [editing, setEditing] = useState(false);
-  const target = props.uri
+  const target = props.uri || webId
   const editable = webId && target === webId
   const maxWidth = props.maxWidth || "100%"
 
@@ -139,7 +139,7 @@ export function ProfileCard(props) {
   const { session } = useSession();
   const { webId } = session.info;
   const [edit, setEdit] = useState(false);
-  const target = props.uri;
+  const target = props.uri || webId;
   const maxWidth = props.maxWidth || "100%";
 
   return (

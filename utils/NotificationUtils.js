@@ -8,11 +8,11 @@ import { ORCHESTRATORPREDICATE } from "./util";
  * Create notification body dataset
  * @param {type: string, actor: string, target: string, object: string} data 
  */
-export async function createNotification(data) {
+export async function createNotification(fetchFunc, data) {
   console.log('creating notification', data)
-  const actorThing = data.actor ? getThing(await getSolidDataset(data.actor), data.actor) : null
-  const objectThing = data.object ? getThing(await getSolidDataset(data.object), data.object) : null
-  const targetThing = data.target ? getThing(await getSolidDataset(data.target), data.target) : null
+  const actorThing = data.actor ? getThing(await getSolidDataset(data.actor, {fetch: fetchFunc}), data.actor) : null
+  const objectThing = data.object ? getThing(await getSolidDataset(data.object, {fetch: fetchFunc}), data.object) : null
+  const targetThing = data.target ? getThing(await getSolidDataset(data.target, {fetch: fetchFunc}), data.target) : null
   const originThing = buildThing(createThing({url: "https://mellon.com/dashboard"}))
     .addUrl(RDF.type, AS.Application)
     .addStringNoLocale(AS.name, "Mellon dashboard application")

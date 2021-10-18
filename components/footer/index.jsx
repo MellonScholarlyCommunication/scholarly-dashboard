@@ -43,4 +43,4 @@ const footerTexts = [
   },
 ];
 
-export default () => <Footer texts={footerTexts} links={footerLinks} />;
+export default () => <Footer texts={footerTexts} links={footerLinks} style={{paddingBottom: "25px"}} />;
