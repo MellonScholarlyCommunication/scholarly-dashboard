@@ -31,6 +31,7 @@ async function discoverBodyAuthorLinks(fetchFunction, uri) {
 }
 
 export async function getEventIds(fetchFunction, uri) {
+  if (!uri) return [];
   // Check Headers
   // TODO:: discoverLinkHeaders(fetchFunction, uri)
 
@@ -40,7 +41,7 @@ export async function getEventIds(fetchFunction, uri) {
   // recursive call met links
   for (const webId of await discoverBodyAuthorLinks(fetchFunction, uri)) {
     eventLogs = eventLogs.concat(
-      await discoverBodyOutboxLinks(fetchFunction, webId)
+      (await discoverBodyOutboxLinks(fetchFunction, webId)) || []
     );
   }
 

@@ -48,6 +48,7 @@ import MessageIcon from "@mui/icons-material/Message";
 
 import { VCARD } from "@inrupt/lit-generated-vocab-common";
 
+import { Label } from "@inrupt/prism-react-components";
 import { ArtefactListingComponent } from "../artefacts";
 import { EventListingComponent } from "../eventLog";
 import ProfileAvatar from "./avatar";
@@ -129,114 +130,72 @@ export function ProfileCard(props) {
   const target = uri || webId;
   const width = maxWidth || "100%";
 
+  function createCardLabel(label, size) {
+    return (
+      <Grid item xs={12} sm={size} md={size - 1}>
+        <Label>{label}</Label>
+      </Grid>
+    );
+  }
+
+  function createCardIcon(IconComponent, size) {
+    return (
+      <Grid item xs={12} sm={size} md={size - 1}>
+        {IconComponent}
+      </Grid>
+    );
+  }
+  function createCardEntry(property, size, edit) {
+    return (
+      <Grid item xs={12} sm={size} md={size + 1} className="valueParent">
+        <Text property={property} edit={edit} autosave />
+      </Grid>
+    );
+  }
+
   return (
     <CombinedDataProvider datasetUrl={target} thingUrl={target}>
       <Card style={{ width }}>
-        <Grid container spacing={2} justify="center">
-          <Grid item xs={12} sm={9}>
-            <CardContent>
-              <Typography gutterBottom variant="h2" component="h2">
-                <Text property={VCARD.fn} edit={edit} autosave />
-              </Typography>
+        <CardContent>
+          <Grid container spacing={2}>
+            <Grid item sm={9} xs={12}>
+              <Grid container spacing={2}>
+                {createCardLabel("Name", 2)}
+                {createCardEntry(VCARD.fn, 10, edit)}
+                {createCardLabel("Title", 2)}
+                {createCardEntry(VCARD.title, 10, edit)}
 
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Text property={VCARD.title} edit={edit} autosave />
-              </Typography>
+                {createCardIcon(<BusinessIcon />, 2)}
+                {createCardEntry(VCARD.organization_name, 10, edit)}
 
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <BusinessIcon />
-                <Text property={VCARD.organization_name} edit={edit} autosave />
-              </Typography>
+                {createCardIcon(<PhoneIcon />, 2)}
+                {createCardEntry(VCARD.hasTelephone, 10, edit)}
 
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <PhoneIcon />
-                <Text property={VCARD.hasTelephone} edit={edit} autosave />
-              </Typography>
+                {createCardIcon(<EmailIcon />, 2)}
+                {createCardEntry(VCARD.hasEmail, 10, edit)}
 
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <EmailIcon />
-                <Text property={VCARD.hasEmail} edit={edit} autosave />
-              </Typography>
+                {createCardIcon(<MessageIcon />, 2)}
+                {createCardEntry(VCARD.hasInstantMessage, 10, edit)}
 
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <MessageIcon />
-                <Value
-                  property={VCARD.hasInstantMessage}
-                  edit={edit}
-                  autosave
-                  onError={() => {}}
-                  dataType="url"
-                />
-              </Typography>
-
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                }}
-              />
-            </CardContent>
-
-            {editable && webId && target === webId && (
-              <Button onClick={() => setEdit(!edit)}>
-                {edit ? "Finish editing profile" : "Edit Profile information"}
-              </Button>
-            )}
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <CardContent>
+                {editable && webId && target === webId && (
+                  <Button onClick={() => setEdit(!edit)}>
+                    {edit
+                      ? "Finish editing profile"
+                      : "Edit Profile information"}
+                  </Button>
+                )}
+              </Grid>
+            </Grid>
+            <Grid item sm={3} xs={12}>
               <ProfileAvatar
                 property={VCARD.hasPhoto}
                 edit={edit}
                 autosave
                 size="100%"
               />
-            </CardContent>
+            </Grid>
           </Grid>
-        </Grid>
+        </CardContent>
       </Card>
     </CombinedDataProvider>
   );

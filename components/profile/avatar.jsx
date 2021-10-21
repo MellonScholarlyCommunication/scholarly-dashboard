@@ -16,7 +16,7 @@ import { Avatar, Button } from "@material-ui/core";
 import { Input } from "@inrupt/prism-react-components";
 
 export default function ProfileAvatar(props) {
-  const { edit, size } = props;
+  const { edit, size, maxHeight } = props;
   const { solidDataset: dataset, setDataset } = useContext(DatasetContext);
   const datasetUrl = getSourceUrl(dataset);
   const { fetch } = useContext(SessionContext);
@@ -26,7 +26,8 @@ export default function ProfileAvatar(props) {
   const [imageURL, setImageURL] = useState(profileImageURL);
 
   async function updateImage() {
-    thing = await setUrl(thing, VCARD.hasPhoto, imageURL);
+    if (!imageURL) return;
+    thing = await setUrl(thing, VCARD.hasPhoto, imageURL.trim());
     const savedDataset = await saveSolidDatasetAt(
       getSourceUrl(dataset),
       setThing(dataset, thing),
@@ -45,6 +46,7 @@ export default function ProfileAvatar(props) {
       <Avatar
         src={imageURL}
         variant="rounded"
+        className="avatar"
         style={{ width: size, height: size }}
       />
       <Button onClick={updateImage}>Update profile image</Button>
@@ -54,6 +56,7 @@ export default function ProfileAvatar(props) {
       alt="No profile picture"
       src={profileImageURL}
       variant="rounded"
+      className="avatar"
       style={{ width: size, height: size }}
     />
   );

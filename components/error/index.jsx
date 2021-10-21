@@ -6,8 +6,9 @@ export default function ErrorComponent(props) {
   return (
     <div>
       <label>
-        The requested resource at {uri} could not be retrieved:
-        {message || "Unknown error"}
+        {`The requested resource ${
+          uri && `at ${uri}`
+        } could not be retrieved: ${message || "Unknown error"}`}
       </label>
     </div>
   );

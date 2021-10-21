@@ -11,6 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import LanguageIcon from "@mui/icons-material/Language";
 import PersonIcon from "@material-ui/icons/Person";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -37,13 +38,13 @@ const routingOptions = {
     label: "Artefacts",
     pathname: "/artefacts",
     query: null,
-    icon: <InboxIcon />,
+    icon: <FolderOpenIcon />,
   },
   events: {
     label: "Events",
     pathname: "/events",
     query: null,
-    icon: <UploadFileIcon />,
+    icon: <InboxIcon />,
   },
   notifications: {
     label: "Notifications",
@@ -53,14 +54,14 @@ const routingOptions = {
   },
 
   upload: {
-    label: "Upload",
+    label: "Upload Artefact",
     pathname: "/upload",
     query: null,
     icon: <UploadFileIcon />,
   },
-  createNotifications: {
-    label: "Create Notification",
-    pathname: "/notifications/create",
+  createEvent: {
+    label: "Create Event",
+    pathname: "/events/create",
     query: null,
     icon: <MailIcon />,
   },
@@ -84,6 +85,20 @@ export default function MyDrawer({ children }) {
     });
   }
 
+  function createListItem(object) {
+    return (
+      <ListItem
+        button
+        key={object.label}
+        style={{ padding: "8px 16px" }}
+        onClick={() => route(router, object)}
+      >
+        <ListItemIcon>{object.icon}</ListItemIcon>
+        <ListItemText primary={object.label} />
+      </ListItem>
+    );
+  }
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -103,52 +118,21 @@ export default function MyDrawer({ children }) {
         <Toolbar />
         <Box id="box">
           <List>
-            {[
-              routingOptions.browser,
-              routingOptions.profile,
-              routingOptions.notifications,
-            ].map((object) => (
-              <ListItem
-                button
-                key={object.label}
-                style={{ padding: "8px 16px" }}
-                onClick={() => route(router, object)}
-              >
-                <ListItemIcon>{object.icon}</ListItemIcon>
-                <ListItemText primary={object.label} />
-              </ListItem>
-            ))}
+            {createListItem(routingOptions.browser)}
+            {createListItem(routingOptions.profile)}
           </List>
           <Divider />
           <List>
-            {[routingOptions.upload, routingOptions.createNotifications].map(
-              (object) => (
-                <ListItem
-                  button
-                  key={object.label}
-                  style={{ padding: "8px 16px" }}
-                  onClick={() => route(router, object)}
-                >
-                  <ListItemIcon>{object.icon}</ListItemIcon>
-                  <ListItemText primary={object.label} />
-                </ListItem>
-              )
-            )}
+            {createListItem(routingOptions.artefacts)}
+            {createListItem(routingOptions.upload)}
           </List>
           <Divider />
           <List>
-            {[routingOptions.settings].map((object) => (
-              <ListItem
-                button
-                key={object.label}
-                style={{ padding: "8px 16px" }}
-                onClick={() => route(router, object)}
-              >
-                <ListItemIcon>{object.icon}</ListItemIcon>
-                <ListItemText primary={object.label} />
-              </ListItem>
-            ))}
+            {createListItem(routingOptions.events)}
+            {createListItem(routingOptions.createEvent)}
           </List>
+          <Divider />
+          <List>{createListItem(routingOptions.settings)}</List>
         </Box>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>

@@ -78,7 +78,7 @@ export function NotificationCard(props) {
   return getContent(thing, error);
 }
 
-export function CreateNotificationView() {
+export function CreateEventView() {
   const { session } = useSession();
   const { webId } = session.info;
   const { register, handleSubmit } = useForm();

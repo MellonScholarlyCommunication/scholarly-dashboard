@@ -10,28 +10,40 @@ import { getEventData, getEventIds } from "./eventlog";
  */
 function EventListingComponent(props) {
   const { session } = useSession();
+  const { webId } = session.info;
   const { target } = props;
-  const [ids, setIds] = useState([]); // List of event URIs
+  const [ids, setIds] = useState(null); // List of event URIs
+  const targetWebId = target || webId;
 
   useEffect(() => {
     let running = true;
     async function effect() {
-      const ids = await getEventIds(session.fetch, target);
+      const ids = await getEventIds(session.fetch, targetWebId);
       if (running) setIds(ids);
     }
     effect();
     return () => {
       running = false;
     };
-  }, [session.fetch, target]);
+  }, [session.fetch, targetWebId]);
+
+  function getContents() {
+    if (!ids) {
+      return <label>Loading Event information</label>;
+    }
+    if (ids && ids.length === 0) {
+      return <label>No Events could be found</label>;
+    }
+    return ids.map((id) => (
+      <Grid item md={3} sm={6} xs={12} key={`listingcard${id}`}>
+        <EventCardComponent id={id} key={`cardcomponent${id}`} />
+      </Grid>
+    ));
+  }
 
   return (
     <Grid container spacing={1}>
-      {ids.map((id) => (
-        <Grid item md={3} sm={6} xs={12} key={`listingcard${id}`}>
-          <EventCardComponent id={id} key={`cardcomponent${id}`} />
-        </Grid>
-      ))}
+      {getContents()}
     </Grid>
   );
 }

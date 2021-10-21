@@ -14,17 +14,17 @@ import {
   getResourceInfo,
   isContainer,
   createContainerAt,
+  overwriteFile,
 } from "@inrupt/solid-client";
 import { SOLID } from "@inrupt/vocab-solid";
 import { AS } from "@inrupt/lit-generated-vocab-common";
 import DataFactory from "@rdfjs/data-model";
 import rdfSerializer from "rdf-serialize";
-import { overwriteFile } from "@inrupt/solid-ui-react/dist/src/helpers";
 import { getQuadsFromDataset, NS_ORE } from "./util";
 // eslint-disable-next-line import/no-cycle
 import { createNotification, sendNotification } from "./NotificationUtils";
 import {
-  generateArtefactResourceDescription,
+  generateArtefactResourceDescriptionQuads,
   generateTypeIndexEntryThing,
 } from "./ArtefactMetadataGeneration";
 
@@ -44,22 +44,20 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   );
   const fileLocation = getSourceUrl(submittedFile);
   data.resourceURI = fileLocation;
+  console.log("getSubmittedFile", fileLocation);
 
-  const artefactResourceDescription = generateArtefactResourceDescription(
-    webId,
-    data
-  );
+  const artefactResourceDescriptionQuads =
+    generateArtefactResourceDescriptionQuads(webId, data);
   // const artefactFileSubmitted = await saveSolidDatasetInContainer(
   //   data.location,
   //   artefactResourceDescription,
   //   { fetch: fetchFunc }             // fetch from authenticated Session
   // );
 
-  const response = await postDatasetAtURLWithDefaultThing(
+  const response = await postQuadsAtURL(
     fetchFunc,
-    artefactResourceDescription,
+    artefactResourceDescriptionQuads,
     data.location,
-    "resourceMap",
     "text/turtle"
   );
   const resourceMapLocation = response.headers.get("Location");
@@ -90,7 +88,8 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   return { fileId: fileLocation, resourceMapURI: resourceMapLocation };
 }
 
-const defaultNamePrefix = "https://inrupt.com/.well-known/sdk-local-node/";
+export const DEFAULTNAMEPREFIX =
+  "https://inrupt.com/.well-known/sdk-local-node/";
 const streamifyArray = require("streamify-array");
 const stringifyStream = require("stream-to-string");
 
@@ -104,10 +103,14 @@ export async function postDatasetAtURLWithDefaultThing(
   let datasetQuads = getQuadsFromDataset(dataset);
   // Process quads to map default URL on the url of the to be posted thing
   const defaultNamedNode = DataFactory.namedNode("");
-  defaultName = defaultNamePrefix + defaultName;
+  defaultName = DEFAULTNAMEPREFIX + defaultName;
   datasetQuads = datasetQuads.map((q) => {
-    if (q.subject.value === defaultName) q.subject = defaultNamedNode;
-    if (q.object.value === defaultName) q.object = defaultNamedNode;
+    if (q.subject.value === defaultName) {
+      q.subject = defaultNamedNode;
+    }
+    if (q.object.value === defaultName) {
+      q.object = defaultNamedNode;
+    }
     return q;
   });
   const quadStream = streamifyArray(datasetQuads);
@@ -115,6 +118,26 @@ export async function postDatasetAtURLWithDefaultThing(
     contentType,
   });
   const stringRepresentation = await stringifyStream(textStream);
+  return await fetchFunction(containerURL, {
+    method: "POST",
+    headers: { "Content-Type": contentType },
+    body: stringRepresentation,
+  });
+}
+
+export async function postQuadsAtURL(
+  fetchFunction,
+  quads,
+  containerURL,
+  contentType
+) {
+  console.log("quads", JSON.stringify(quads, null, 2));
+  const quadStream = streamifyArray(quads);
+  const textStream = rdfSerializer.serialize(quadStream, {
+    contentType,
+  });
+  const stringRepresentation = await stringifyStream(textStream);
+  console.log("repr", stringRepresentation);
   return await fetchFunction(containerURL, {
     method: "POST",
     headers: { "Content-Type": contentType },
@@ -184,6 +207,7 @@ export async function getTypeRegistrationEntry(
   webId,
   artefactTypes
 ) {
+  if (!webId) return [];
   const matches = { instances: [], containers: [] };
   const profileDataset = await getSolidDataset(webId, { fetch: fetchFunc });
   const profileThing = getThing(profileDataset, webId);
@@ -223,15 +247,23 @@ export async function getArtefactMetadataThings(
   fetchFunc,
   artefactResourceMapId
 ) {
+  console.log("getting artefact resource", artefactResourceMapId);
   const resourceMapDataset = await getSolidDataset(artefactResourceMapId, {
     fetch: fetchFunc,
   });
   const resourceMapThing = getThing(resourceMapDataset, artefactResourceMapId);
 
   const aggregationId = getUrl(resourceMapThing, `${NS_ORE}describes`);
+  console.log("getting aggregation resource", aggregationId);
   const aggregationDataset = await getSolidDataset(aggregationId, {
     fetch: fetchFunc,
   });
+  console.log(
+    "AGGREGATIONID",
+    aggregationId,
+    aggregationDataset,
+    resourceMapThing
+  );
   const aggregationThing = getThing(aggregationDataset, aggregationId);
 
   return {

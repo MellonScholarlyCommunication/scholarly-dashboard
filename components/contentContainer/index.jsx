@@ -52,6 +52,9 @@ function ContentContainer() {
     if (error) {
       return <ErrorComponent uri={target} />;
     }
+    if (!target) {
+      return <ErrorComponent uri={target} message="No target URI given." />;
+    }
     if (!thing) {
       return <LoadingComponent uri={target} />;
     }

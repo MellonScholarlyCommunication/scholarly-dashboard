@@ -50,16 +50,21 @@ export function SettingsView() {
 
     // Check if outbox exists and create if not.
     if (outboxUrl) {
-      createFolderRecursiveIfNotExists(inboxUrl, session.fetch);
+      createFolderRecursiveIfNotExists(outboxUrl, session.fetch);
     }
 
     // Check if type index exists and create if not.
     if (typeIndexUrl) {
       const body = `
-      // @prefix : <#>.
-      // @prefix solid: <http://www.w3.org/ns/solid/terms#>.
-      // <> a solid:ListedDocument, solid:TypeIndex.`;
-      createResourceIfNotExists(inboxUrl, body, "text/turtle", session.fetch);
+      @prefix : <#>.
+      @prefix solid: <http://www.w3.org/ns/solid/terms#>.
+      <> a solid:ListedDocument, solid:TypeIndex.`;
+      createResourceIfNotExists(
+        typeIndexUrl,
+        body,
+        "text/turtle",
+        session.fetch
+      );
     }
 
     //     let thing = getThing(await getSolidDataset(webId, {fetch: session.fetch}), webId)
