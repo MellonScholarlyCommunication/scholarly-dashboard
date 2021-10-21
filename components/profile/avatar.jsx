@@ -16,7 +16,7 @@ import { Avatar, Button } from "@material-ui/core";
 import { Input } from "@inrupt/prism-react-components";
 
 export default function ProfileAvatar(props) {
-  const { edit, size, maxHeight } = props;
+  const { edit, size } = props;
   const { solidDataset: dataset, setDataset } = useContext(DatasetContext);
   const datasetUrl = getSourceUrl(dataset);
   const { fetch } = useContext(SessionContext);

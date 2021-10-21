@@ -1,11 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  Container,
-} from "@material-ui/core";
+import { Card, CardContent, Grid, Container } from "@material-ui/core";
 import { AS, DCTERMS, RDF } from "@inrupt/vocab-common-rdf";
 import { useForm } from "react-hook-form";
 import { useSession, useThing } from "@inrupt/solid-ui-react";
@@ -37,19 +31,10 @@ function createLabelledValue(label, property, thing) {
   return (
     <Grid container spacing={2}>
       <Grid item sm={3} xs={12}>
-        <Typography gutterBottom variant="h5" component="h3">
-          {label}
-        </Typography>
+        {label}
       </Grid>
       <Grid item sm={9} xs={12}>
-        <Typography
-          gutterBottom
-          variant="h6"
-          component="h3"
-          style={{ marginLeft: "10px" }}
-        >
-          <a href={getUrl(thing, property)}>{getUrl(thing, property)}</a>
-        </Typography>
+        <a href={getUrl(thing, property)}>{getUrl(thing, property)}</a>
       </Grid>
     </Grid>
   );
@@ -112,9 +97,7 @@ export function CreateEventView() {
     <Container fixed>
       <Card>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="h3">
-            Create Notification
-          </Typography>
+          Create Notification
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={2}>
               <Grid item sm={2} xs={12}>

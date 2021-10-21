@@ -66,11 +66,12 @@ function AppContainer(props) {
   useEffect(() => {
     const authFetch = session.fetch;
     const browserFetch = window.fetch.bind(window);
-    session.fetch = function (...args) {
+    const customFetch = (...args) => {
       const { webId } = session.info;
       if (webId) return authFetch(...args);
       return browserFetch(...args);
     };
+    session.fetch = customFetch;
   }, [session]);
 
   const router = useRouter();

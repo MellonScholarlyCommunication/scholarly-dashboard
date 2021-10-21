@@ -6,7 +6,7 @@ import {
   useSession,
   Value,
 } from "@inrupt/solid-ui-react";
-import { Button, Card, CardContent, Grid, Typography } from "@material-ui/core";
+import { Button, Card, CardContent, Grid } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DCTERMS, VCARD } from "@inrupt/lit-generated-vocab-common";
@@ -39,14 +39,10 @@ function createCardContent(label, valueObjects, size = 8) {
     <CardContent style={{ margin: ".25em", padding: ".15em" }}>
       <Grid container spacing={2}>
         <Grid item xs={12 - size} sm={12 - size + 1} md={12 - size - 2}>
-          <Typography gutterBottom variant="h6" component="h3">
-            {label}
-          </Typography>
+          {label}
         </Grid>
         <Grid item xs={size} sm={size + 1} md={size + 2}>
-          <Typography gutterBottom variant="h6" component="h3">
-            {valueObjects}
-          </Typography>
+          {valueObjects}
         </Grid>
       </Grid>
     </CardContent>
@@ -145,17 +141,15 @@ function ArtefactCardComponent(props) {
             }}
           >
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h3">
-                <Link
-                  href={{
-                    pathname: "/",
-                    query: { uri: metadata.resourceMap.url },
-                  }}
-                >
-                  {metadata &&
-                    getStringNoLocale(metadata.resourceMap, DCTERMS.title)}
-                </Link>
-              </Typography>
+              <Link
+                href={{
+                  pathname: "/",
+                  query: { uri: metadata.resourceMap.url },
+                }}
+              >
+                {metadata &&
+                  getStringNoLocale(metadata.resourceMap, DCTERMS.title)}
+              </Link>
 
               {createCardContent(
                 "Title",
@@ -241,14 +235,11 @@ function ArtefactViewComponent(props) {
             }}
           >
             <CardContent>
-              <Typography gutterBottom variant="h1" component="h1">
-                <Value
-                  property={DCTERMS.title}
-                  thing={metadata.resourceMap}
-                  dataType="string"
-                />
-              </Typography>
-
+              <Value
+                property={DCTERMS.title}
+                thing={metadata.resourceMap}
+                dataType="string"
+              />
               {createCardContent(
                 "Created",
                 <Value
@@ -281,27 +272,22 @@ function ArtefactViewComponent(props) {
                   )
                 )
               )}
-
               <hr />
-              <Typography gutterBottom variant="h5" component="h3">
-                Aggregated Resources
-              </Typography>
-
+              Aggregated Resources
               <Grid container spacing={2}>
                 {metadata.instances.map((instanceThing) => {
                   return (
                     <Grid item xs={12} sm={6} md={6} lg={4}>
                       <Card>
                         <CardContent>
-                          <Typography gutterBottom variant="h3" component="h3">
-                            <a href={instanceThing.url}>
-                              <Value
-                                property={DCTERMS.title}
-                                thing={instanceThing}
-                                dataType="string"
-                              />
-                            </a>
-                          </Typography>
+                          <a href={instanceThing.url}>
+                            <Value
+                              property={DCTERMS.title}
+                              thing={instanceThing}
+                              dataType="string"
+                            />
+                          </a>
+
                           {createCardContent(
                             "Format",
                             <Value
@@ -331,11 +317,8 @@ function ArtefactViewComponent(props) {
                   );
                 })}
               </Grid>
-
               <hr />
-              <Typography gutterBottom variant="h5" component="h3">
-                Events
-              </Typography>
+              Events
               {webId && (
                 <EventListingComponent target={webId} artefactId={artefactId} />
               )}

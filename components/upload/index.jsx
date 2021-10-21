@@ -8,7 +8,7 @@ import {
 import { Input, Textarea } from "@inrupt/prism-react-components";
 import { getUrlAll } from "@inrupt/solid-client";
 import { useSession, useThing } from "@inrupt/solid-ui-react";
-import { Button, Card, Container, Grid, Typography } from "@material-ui/core";
+import { Button, Card, Container, Grid } from "@material-ui/core";
 import { useRouter } from "next/router";
 
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -93,9 +93,7 @@ function UploadComponent() {
 
   return (
     <Container fixed>
-      <Card style={{ paddingLeft: "1%" }}>
-        <Typography> Upload </Typography>
-      </Card>
+      <Card style={{ paddingLeft: "1%" }}>Upload</Card>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card style={{ paddingLeft: "5%" }}>
           <Grid container spacing={1}>

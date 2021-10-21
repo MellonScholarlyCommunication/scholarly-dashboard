@@ -21,12 +21,7 @@
 
 import { useState } from "react";
 
-import {
-  useSession,
-  CombinedDataProvider,
-  Text,
-  Value,
-} from "@inrupt/solid-ui-react";
+import { useSession, CombinedDataProvider, Text } from "@inrupt/solid-ui-react";
 
 import {
   Button,
@@ -34,7 +29,6 @@ import {
   CardContent,
   Container,
   Grid,
-  Typography,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -85,7 +79,7 @@ export default function ProfileView(props) {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Profile</Typography>
+              Profile
             </AccordionSummary>
             <AccordionDetails>
               <ProfileCard uri={target} editable />
@@ -98,7 +92,7 @@ export default function ProfileView(props) {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Artefacts</Typography>
+              Artefacts
             </AccordionSummary>
             <AccordionDetails>
               <ArtefactListingComponent target={target} />
@@ -110,7 +104,7 @@ export default function ProfileView(props) {
               aria-controls="panel2a-content"
               id="panel2a-header"
             >
-              <Typography>Events</Typography>
+              Events
             </AccordionSummary>
             <AccordionDetails>
               <EventListingComponent target={target} />

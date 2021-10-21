@@ -1,6 +1,6 @@
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState, useEffect } from "react";
-import { Card, CardContent, Grid, Typography } from "@material-ui/core";
+import { Card, CardContent, Grid } from "@material-ui/core";
 import { getEventData, getEventIds } from "./eventlog";
 
 /**
@@ -83,52 +83,22 @@ function EventCardComponent(props) {
           <small>
             <a href={id}>{id}</a>
           </small>
-          <Typography gutterBottom variant="h5" component="h3">
-            {getProp(event, "title")}
-          </Typography>
+
+          {getProp(event, "title")}
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
-            <Typography gutterBottom variant="h6" component="h3">
-              Type
-            </Typography>
-            <Typography
-              gutterBottom
-              variant="h6"
-              component="h3"
-              style={{ marginLeft: "10px" }}
-            >
-              <a href={getProp(event, "type")}>{getProp(event, "type")}</a>
-            </Typography>
+            Type
+            <a href={getProp(event, "type")}>{getProp(event, "type")}</a>
           </CardContent>
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
-            <Typography gutterBottom variant="h6" component="h3">
-              Subject
-            </Typography>
-            <Typography
-              gutterBottom
-              variant="h6"
-              component="h3"
-              style={{ marginLeft: "10px" }}
-            >
-              <a href={getProp(event, "subject")}>
-                {getProp(event, "subject")}
-              </a>
-            </Typography>
+            Subject
+            <a href={getProp(event, "subject")}>{getProp(event, "subject")}</a>
           </CardContent>
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
-            <Typography gutterBottom variant="h6" component="h3">
-              Object
-            </Typography>
-            <Typography
-              gutterBottom
-              variant="h6"
-              component="h3"
-              style={{ marginLeft: "10px" }}
-            >
-              <a href={getProp(event, "object")}>{getProp(event, "object")}</a>
-            </Typography>
+            Object
+            <a href={getProp(event, "object")}>{getProp(event, "object")}</a>
           </CardContent>
         </Card>
       )}

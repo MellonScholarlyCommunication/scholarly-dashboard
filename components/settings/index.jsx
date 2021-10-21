@@ -8,14 +8,7 @@ import {
 } from "@inrupt/solid-ui-react";
 import { AS } from "@inrupt/vocab-common-rdf";
 import { SOLID } from "@inrupt/vocab-solid";
-import {
-  CardContent,
-  Container,
-  Grid,
-  Typography,
-  Card,
-  Button,
-} from "@material-ui/core";
+import { CardContent, Container, Grid, Card, Button } from "@material-ui/core";
 import { useRouter } from "next/router";
 import { ORCHESTRATORPREDICATE } from "../../utils/util";
 import {
@@ -66,34 +59,6 @@ export function SettingsView() {
         session.fetch
       );
     }
-
-    //     let thing = getThing(await getSolidDataset(webId, {fetch: session.fetch}), webId)
-    //     console.log('thing', thing, SOLID.publicTypeIndex)
-    //     console.log('url', getUrlAll(thing, "http://www.w3.org/ns/solid/terms#publicTypeIndex"))
-    //     let typeIndexUrl = getUrl(thing, SOLID.publicTypeIndex)
-    //     console.log('typeIndexUrl', typeIndexUrl, getUrl(thing, SOLID.publicTypeIndex))
-
-    //     // Check if publicTypeIndex exists, and if not initialize the file
-    //     let ptiInfo = null;
-    //     try {
-    //       ptiInfo = await getResourceInfo(typeIndexUrl)
-    //     } catch (e) {
-    //       try {
-    //           const contents = `
-    // @prefix : <#>.
-    // @prefix solid: <http://www.w3.org/ns/solid/terms#>.
-    // <> a solid:ListedDocument, solid:TypeIndex.`
-    //         const savedFile = await overwriteFile(
-    //           typeIndexUrl,
-    //           new Blob([contents], { type: "text/turtle" }),
-    //           { contentType: "text/turtle", fetch: session.fetch}
-    //         );
-    //       } catch (e) {
-    //         alert("Could not store index file in its requested container: " + e.message)
-    //         return;
-    //       }
-    //     }
-    //     setEdit(!edit);
   }
 
   const getErrorMessage = (error) => (
@@ -113,24 +78,12 @@ export function SettingsView() {
         <Container>
           <Card>
             <CardContent>
-              <Typography gutterBottom variant="h4" component="h3">
-                Datapod Settings.
-              </Typography>
-              <Typography gutterBottom variant="h6" component="h3">
-                To make full use of the Mellon dashboard, please fill in all
-                fields.
-              </Typography>
-
+              Datapod Settings. To make full use of the Mellon dashboard, please
+              fill in all fields.
               <hr />
-
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
-                  <Typography gutterBottom variant="h5" component="h3">
-                    Inbox
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="h3">
-                    URI of container where notifications are sent to
-                  </Typography>
+                  Inbox URI of container where notifications are sent to
                 </Grid>
                 <Grid item xs={12} sm={9} className="valueParent">
                   <Value
@@ -141,15 +94,9 @@ export function SettingsView() {
                   />
                 </Grid>
               </Grid>
-
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
-                  <Typography gutterBottom variant="h5" component="h3">
-                    Outbox
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="h3">
-                    URI of container to store events
-                  </Typography>
+                  Outbox URI of container to store events
                 </Grid>
                 <Grid item xs={12} sm={9} className="valueParent">
                   <Value
@@ -161,13 +108,8 @@ export function SettingsView() {
                 </Grid>
 
                 <Grid item xs={12} sm={3}>
-                  <Typography gutterBottom variant="h5" component="h3">
-                    Type index file
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="h3">
-                    URI of file storing an index of your linked files linked
-                    from your profile
-                  </Typography>
+                  Type index file URI of file storing an index of your linked
+                  files linked from your profile
                 </Grid>
                 <Grid item xs={12} sm={9} className="valueParent">
                   <Value
@@ -179,12 +121,8 @@ export function SettingsView() {
                 </Grid>
 
                 <Grid item xs={12} sm={3}>
-                  <Typography gutterBottom variant="h5" component="h3">
-                    Orchestrator id
-                  </Typography>
-                  <Typography gutterBottom variant="h6" component="h3">
-                    WebId of the orchestrator that manages this data pod.
-                  </Typography>
+                  Orchestrator id WebId of the orchestrator that manages this
+                  data pod.
                 </Grid>
                 <Grid item xs={12} sm={9} className="valueParent">
                   <Value
