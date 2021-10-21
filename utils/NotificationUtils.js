@@ -17,7 +17,6 @@ import { ORCHESTRATORPREDICATE } from "./util";
  * @param {type: string, actor: string, target: string, object: string} data
  */
 export async function createNotification(fetchFunc, data) {
-  console.log("creating notification", data);
   const actorThing = data.actor
     ? getThing(
         await getSolidDataset(data.actor, { fetch: fetchFunc }),

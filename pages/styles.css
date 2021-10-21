@@ -65,3 +65,7 @@ body,
   object-fit: contain !important;
   max-height: 50vh;
 }
+
+/* .ReactModal__Overlay {
+  z-index: 100000;
+} */

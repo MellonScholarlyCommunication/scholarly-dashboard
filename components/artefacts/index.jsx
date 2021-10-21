@@ -62,7 +62,7 @@ function multiValueGrid(valueComponents) {
 }
 
 function ArtefactListingComponent(props) {
-  const { target } = props;
+  const { target, small } = props;
   const { session } = useSession();
   const { webId } = session.info;
   const [artefactIds, setArtefactIds] = useState(null); // List of artefact URIs
@@ -99,7 +99,14 @@ function ArtefactListingComponent(props) {
       return <label>No Artefacts could be found</label>;
     }
     return artefactIds.map((id) => (
-      <Grid item lg={4} md={6} sm={6} xs={12} key={`artefactcard${id}`}>
+      <Grid
+        item
+        lg={small ? 6 : 4}
+        md={6}
+        sm={6}
+        xs={12}
+        key={`artefactcard${id}`}
+      >
         <ArtefactCardComponent artefactId={id} />
       </Grid>
     ));

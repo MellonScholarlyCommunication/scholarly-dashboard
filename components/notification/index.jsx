@@ -79,7 +79,6 @@ export function CreateEventView() {
       return;
     }
     if (!data.target) {
-      console.log("submitting", data);
       alert("Please select a notification target");
       return;
     }

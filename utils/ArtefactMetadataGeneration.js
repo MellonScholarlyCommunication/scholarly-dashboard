@@ -14,7 +14,6 @@ import { NS_DCMI, NS_ORE } from "./util";
 const quad = require("rdf-quad");
 
 export function generateArtefactResourceDescriptionQuads(webId, metadata) {
-  console.log("metadata", metadata);
   if (!metadata.resourceURI) return [];
   const time = new Date();
 

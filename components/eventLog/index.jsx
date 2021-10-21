@@ -11,7 +11,7 @@ import { getEventData, getEventIds } from "./eventlog";
 function EventListingComponent(props) {
   const { session } = useSession();
   const { webId } = session.info;
-  const { target } = props;
+  const { target, small } = props;
   const [ids, setIds] = useState(null); // List of event URIs
   const targetWebId = target || webId;
 
@@ -35,7 +35,7 @@ function EventListingComponent(props) {
       return <label>No Events could be found</label>;
     }
     return ids.map((id) => (
-      <Grid item md={3} sm={6} xs={12} key={`listingcard${id}`}>
+      <Grid item md={small ? 6 : 4} sm={6} xs={12} key={`listingcard${id}`}>
         <EventCardComponent id={id} key={`cardcomponent${id}`} />
       </Grid>
     ));

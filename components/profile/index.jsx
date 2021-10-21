@@ -95,7 +95,7 @@ export default function ProfileView(props) {
               Artefacts
             </AccordionSummary>
             <AccordionDetails>
-              <ArtefactListingComponent target={target} />
+              <ArtefactListingComponent target={target} small />
             </AccordionDetails>
           </Accordion>
           <Accordion TransitionProps={{ mountOnEnter: true }}>
@@ -107,7 +107,7 @@ export default function ProfileView(props) {
               Events
             </AccordionSummary>
             <AccordionDetails>
-              <EventListingComponent target={target} />
+              <EventListingComponent target={target} small />
             </AccordionDetails>
           </Accordion>
         </Card>

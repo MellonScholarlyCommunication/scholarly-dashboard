@@ -15,6 +15,12 @@ import {
   isContainer,
   createContainerAt,
   overwriteFile,
+  hasResourceAcl,
+  createAclFromFallbackAcl,
+  saveAclFor,
+  access,
+  getResourceInfoWithAcl,
+  setPublicResourceAccess,
 } from "@inrupt/solid-client";
 import { SOLID } from "@inrupt/vocab-solid";
 import { AS } from "@inrupt/lit-generated-vocab-common";
@@ -44,15 +50,9 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   );
   const fileLocation = getSourceUrl(submittedFile);
   data.resourceURI = fileLocation;
-  console.log("getSubmittedFile", fileLocation);
 
   const artefactResourceDescriptionQuads =
     generateArtefactResourceDescriptionQuads(webId, data);
-  // const artefactFileSubmitted = await saveSolidDatasetInContainer(
-  //   data.location,
-  //   artefactResourceDescription,
-  //   { fetch: fetchFunc }             // fetch from authenticated Session
-  // );
 
   const response = await postQuadsAtURL(
     fetchFunc,
@@ -84,6 +84,14 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
     notificationData
   );
   sendNotification(fetchFunc, webId, notificationDataset);
+
+  // Set access to newly created items
+  // Set public read access to uploaded artefact
+  if (fileLocation)
+    await createPublicReadAclIfNotExists(fileLocation, fetchFunc);
+  // Set public read access to uploaded ORE metadata file
+  if (resourceMapLocation)
+    await createPublicReadAclIfNotExists(resourceMapLocation, fetchFunc);
 
   return { fileId: fileLocation, resourceMapURI: resourceMapLocation };
 }
@@ -131,13 +139,11 @@ export async function postQuadsAtURL(
   containerURL,
   contentType
 ) {
-  console.log("quads", JSON.stringify(quads, null, 2));
   const quadStream = streamifyArray(quads);
   const textStream = rdfSerializer.serialize(quadStream, {
     contentType,
   });
   const stringRepresentation = await stringifyStream(textStream);
-  console.log("repr", stringRepresentation);
   return await fetchFunction(containerURL, {
     method: "POST",
     headers: { "Content-Type": contentType },
@@ -247,23 +253,15 @@ export async function getArtefactMetadataThings(
   fetchFunc,
   artefactResourceMapId
 ) {
-  console.log("getting artefact resource", artefactResourceMapId);
   const resourceMapDataset = await getSolidDataset(artefactResourceMapId, {
     fetch: fetchFunc,
   });
   const resourceMapThing = getThing(resourceMapDataset, artefactResourceMapId);
 
   const aggregationId = getUrl(resourceMapThing, `${NS_ORE}describes`);
-  console.log("getting aggregation resource", aggregationId);
   const aggregationDataset = await getSolidDataset(aggregationId, {
     fetch: fetchFunc,
   });
-  console.log(
-    "AGGREGATIONID",
-    aggregationId,
-    aggregationDataset,
-    resourceMapThing
-  );
   const aggregationThing = getThing(aggregationDataset, aggregationId);
 
   return {
@@ -368,3 +366,21 @@ const removeSlashesAtEnd = (url) => {
   }
   return url;
 };
+
+export async function createPublicReadAclIfNotExists(
+  resourceURI,
+  fetchFunction
+) {
+  if (!resourceURI) return;
+  const resourceWithPerms = await getResourceInfoWithAcl(resourceURI, {
+    fetch: fetchFunction,
+  });
+  if (!resourceWithPerms) return;
+  if (!(await hasResourceAcl(resourceWithPerms))) {
+    const resourceAcl = await createAclFromFallbackAcl(resourceWithPerms);
+    const updatedAcl = await setPublicResourceAccess(resourceAcl, {
+      read: true,
+    });
+    await saveAclFor(resourceWithPerms, updatedAcl, { fetch: fetchFunction });
+  }
+}

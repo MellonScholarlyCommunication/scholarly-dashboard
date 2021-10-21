@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Button } from "@material-ui/core";
+import { Container } from "@mui/material";
 import { useState } from "react";
 import Modal from "react-modal";
 
@@ -40,7 +41,9 @@ function ModalComponent(props) {
       style={customStyles}
       contentLabel="Popup"
     >
-      <Component {...passedProps} />
+      <Container style={{ width: "50vw" }}>
+        <Component {...passedProps} />
+      </Container>
     </Modal>
   ) : (
     <Button onClick={openModal}>{placeholder || "View"}</Button>
@@ -53,6 +56,8 @@ function Modalify(Component, props, placeholder) {
       Component={Component}
       placeholder={placeholder}
       passedProps={props}
+      style={{ zIndex: 1000000 }}
+      id="test"
     />
   );
 }
