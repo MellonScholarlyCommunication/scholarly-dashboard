@@ -10,12 +10,13 @@ import { Button, Card, CardContent, Grid } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DCTERMS, VCARD } from "@inrupt/lit-generated-vocab-common";
-import { getStringNoLocale, getUrlAll } from "@inrupt/solid-client";
+import { getStringNoLocale, getUrl, getUrlAll } from "@inrupt/solid-client";
 import { EventListingComponent } from "../eventLog";
 import {
   getArtefactMetadataThings,
   getContainedResourceURLs,
   getTypeRegistrationEntry,
+  LANDINGPAGEPREDICATE,
   LINKTYPE,
 } from "../../utils/FileUtils";
 import { NS_DCMI } from "../../utils/util";
@@ -136,6 +137,9 @@ function ArtefactCardComponent(props) {
     };
   }, [artefactId, session.fetch]);
 
+  const landingPageURI =
+    metadata && getUrl(metadata.resourceMap, LANDINGPAGEPREDICATE);
+
   return (
     <div>
       {metadata && (
@@ -203,6 +207,14 @@ function ArtefactCardComponent(props) {
                 ),
                 6
               )}
+              {landingPageURI && (
+                <Button
+                  style={{ backgroundColor: "lightblue" }}
+                  onClick={() => window.open(landingPageURI)}
+                >
+                  Open Landing Page
+                </Button>
+              )}
             </CardContent>
           </Card>
         </CombinedDataProvider>
@@ -229,6 +241,9 @@ function ArtefactViewComponent(props) {
       running = false;
     };
   }, [artefactId, session.fetch]);
+
+  const landingPageURI =
+    metadata && getUrl(metadata.resourceMap, LANDINGPAGEPREDICATE);
 
   return (
     <div>
@@ -278,6 +293,14 @@ function ArtefactViewComponent(props) {
                     (webId) => getRemoteValueLink(webId, VCARD.fn)
                   )
                 )
+              )}
+              {landingPageURI && (
+                <Button
+                  style={{ backgroundColor: "lightblue" }}
+                  onClick={() => window.open(landingPageURI)}
+                >
+                  Open Landing Page
+                </Button>
               )}
               <hr />
               Aggregated Resources

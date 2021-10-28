@@ -12,7 +12,20 @@ import DataFactory from "@rdfjs/data-model";
 import { NS_DCMI, NS_ORE } from "./util";
 
 const quad = require("rdf-quad");
-
+/**
+ *
+ * @param {string} webId - The WebId of the publisher.
+ * @param {object} metadata - The artefact metadata.
+ * @param {object} metadata.resourceURI - The published file resource URI (the URI of the uploaded / published file itself).
+ * @param {object} metadata.title - The artefact title.
+ * @param {object} metadata.abstract - The artefact abstract.
+ * @param {object} metadata.format - The published file contentType format.
+ * @param {object} metadata.language - The artefact language.
+ * @param {object} metadata.type - The artefact type (publication, dataset, ...).
+ * @param {object} metadata.authors[] - The artefact authors.
+ * @param {object} metadata.authors.webId - The author WebId.
+ * @returns
+ */
 export function generateArtefactResourceDescriptionQuads(webId, metadata) {
   if (!metadata.resourceURI) return [];
   const time = new Date();

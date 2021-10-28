@@ -1,25 +1,23 @@
-const DataFactory = require('@rdfjs/data-model');
-export const ORCHESTRATORPREDICATE = "https://example.com/ns/orchestrator"
-export const NS_ORE = "http://www.openarchives.org/ore/terms/"
-export const NS_DCMI = "http://purl.org/dc/elements/1.1/"
+const DataFactory = require("@rdfjs/data-model");
+
+export const ORCHESTRATORPREDICATE = "https://example.com/ns/orchestrator";
+export const NS_ORE = "http://www.openarchives.org/ore/terms/";
+export const NS_DCMI = "http://purl.org/dc/elements/1.1/";
 
 export function getBaseIRI(IRI) {
   let path = IRI;
   path = path.replace(/(^\w+:|^)\/\//, "");
   path = path.split("/").slice(1).join("/");
-  path =
-    IRI.substring(0, IRI.indexOf(path)).replace(/\/$/, "") +
-    "/";
+  path = `${IRI.substring(0, IRI.indexOf(path)).replace(/\/$/, "")}/`;
   return path;
 }
 
 export function getQuadsFromDataset(dataset) {
-  if(!dataset) return [];
-  return toRdfJsQuads(dataset)
+  if (!dataset) return [];
+  return toRdfJsQuads(dataset);
 }
 
-
-export function toRdfJsQuads( dataset, options = {} ) {
+export function toRdfJsQuads(dataset, options = {}) {
   const quads = [];
   const dataFactory = DataFactory;
 
@@ -31,7 +29,7 @@ export function toRdfJsQuads( dataset, options = {} ) {
         : dataFactory.namedNode(graphIri);
 
     Object.keys(graph).forEach((subjectIri) => {
-      const predicates = graph[subjectIri].predicates;
+      const { predicates } = graph[subjectIri];
       const subjectNode = isBlankNodeId(subjectIri)
         ? dataFactory.blankNode(getBlankNodeValue(subjectIri))
         : dataFactory.namedNode(subjectIri);
@@ -44,9 +42,14 @@ export function toRdfJsQuads( dataset, options = {} ) {
   return quads;
 }
 
-export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options = {} ) {
+export function subjectToRdfJsQuads(
+  predicates,
+  subjectNode,
+  graphNode,
+  options = {}
+) {
   const quads = [];
-  const dataFactory = DataFactory
+  const dataFactory = DataFactory;
 
   Object.keys(predicates).forEach((predicateIri) => {
     const predicateNode = dataFactory.namedNode(predicateIri);
@@ -62,12 +65,7 @@ export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options
       literalValues.forEach((value) => {
         const literalNode = dataFactory.literal(value, typeNode);
         quads.push(
-          dataFactory.quad(
-            subjectNode,
-            predicateNode,
-            literalNode,
-            graphNode
-          ) 
+          dataFactory.quad(subjectNode, predicateNode, literalNode, graphNode)
         );
       });
     });
@@ -90,14 +88,7 @@ export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options
 
     namedNodes.forEach((namedNodeIri) => {
       const node = dataFactory.namedNode(namedNodeIri);
-      quads.push(
-        dataFactory.quad(
-          subjectNode,
-          predicateNode,
-          node,
-          graphNode
-        )
-      );
+      quads.push(dataFactory.quad(subjectNode, predicateNode, node, graphNode));
     });
 
     blankNodes.forEach((blankNodeIdOrPredicates) => {
@@ -106,12 +97,7 @@ export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options
           getBlankNodeValue(blankNodeIdOrPredicates)
         );
         quads.push(
-          dataFactory.quad(
-            subjectNode,
-            predicateNode,
-            blankNode,
-            graphNode
-          )
+          dataFactory.quad(subjectNode, predicateNode, blankNode, graphNode)
         );
       } else {
         const node = dataFactory.blankNode();
@@ -120,7 +106,7 @@ export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options
           predicateNode,
           node,
           graphNode
-        )
+        );
         const blankNodeSubjectQuads = subjectToRdfJsQuads(
           blankNodeIdOrPredicates,
           node,
@@ -135,9 +121,7 @@ export function subjectToRdfJsQuads( predicates, subjectNode, graphNode, options
   return quads;
 }
 
-
-
-function isLocalNodeIri( iri ) {
+function isLocalNodeIri(iri) {
   return (
     iri.substring(0, localNodeSkolemPrefix.length) === localNodeSkolemPrefix
   );
@@ -146,7 +130,7 @@ function getLocalNodeName(localNodeIri) {
   return localNodeIri.substring(localNodeSkolemPrefix.length);
 }
 function getLocalNodeIri(localNodeName) {
-  return (`${localNodeSkolemPrefix}${localNodeName}`)
+  return `${localNodeSkolemPrefix}${localNodeName}`;
 }
 
 function isBlankNodeId(value) {
@@ -158,5 +142,5 @@ function getBlankNodeValue(blankNodeId) {
 }
 
 function getBlankNodeId(blankNode) {
-  return (`_:${blankNode.value}`)
+  return `_:${blankNode.value}`;
 }

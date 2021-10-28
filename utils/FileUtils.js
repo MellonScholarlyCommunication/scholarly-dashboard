@@ -18,26 +18,46 @@ import {
   hasResourceAcl,
   createAclFromFallbackAcl,
   saveAclFor,
-  access,
   getResourceInfoWithAcl,
   setPublicResourceAccess,
+  getStringNoLocale,
+  asUrl,
+  setUrl,
 } from "@inrupt/solid-client";
 import { SOLID } from "@inrupt/vocab-solid";
-import { AS } from "@inrupt/lit-generated-vocab-common";
+import { AS, FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
 import DataFactory from "@rdfjs/data-model";
 import rdfSerializer from "rdf-serialize";
-import { getQuadsFromDataset, NS_ORE } from "./util";
+import { getBaseIRI, getQuadsFromDataset, NS_ORE } from "./util";
 // eslint-disable-next-line import/no-cycle
 import { createNotification, sendNotification } from "./NotificationUtils";
 import {
   generateArtefactResourceDescriptionQuads,
   generateTypeIndexEntryThing,
 } from "./ArtefactMetadataGeneration";
+import generateLandingPageHTML from "./LandingPageGeneration";
+
+const LinkHeader = require("http-link-header");
 
 export const LINKTYPE = `${NS_ORE}ResourceMap`;
+export const LANDINGPAGEPREDICATE = "https://mellon.org/ns/landingPage";
 
+/**
+ *
+ * @param {*} fetchFunc The authenticated fetch function for Solid.
+ * @param {*} webId The user WebId.
+ * @param {*} data The artefact data object.
+ * @param {*} data.title The artefact title.
+ * @param {*} data.abstract The artefact abstract.
+ * @param {*} data.file The artefact file.
+ * @param {*} data.type The artefact type (publication, dataset, ...).
+ * @param {*} data.format The artefact content type.
+ * @returns
+ */
 export async function postArtefactWithMetadata(fetchFunc, webId, data) {
+  console.log("posting with metadata", data);
   // TODO Validation
+  const randomizedUUID = Math.floor(1000 + Math.random() * 9000);
 
   data.contentType = data.contentType || "text/turtle";
 
@@ -46,7 +66,8 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   const submittedFile = await postFileToContainer(
     fetchFunc,
     data.location,
-    data.file
+    data.file,
+    randomizedUUID
   );
   const fileLocation = getSourceUrl(submittedFile);
   data.resourceURI = fileLocation;
@@ -61,7 +82,65 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
     "text/turtle"
   );
   const resourceMapLocation = response.headers.get("Location");
+  const aggregationURI =
+    resourceMapLocation && `${resourceMapLocation}#aggregation`;
+  const userThing = getThing(
+    await getSolidDataset(webId, { fetch: fetchFunc }),
+    webId
+  );
+  let authorThings = data.authors.map(async (a) =>
+    getThing(await getSolidDataset(a.webId, { fetch: fetchFunc }), a.webId)
+  );
+  authorThings = await Promise.all(authorThings);
 
+  // Create artefact landing page
+  const landingPageHTML = generateLandingPageHTML({
+    baseURL: data.location, // The BaseURL of the landing page is the location where the resources are uploaded.
+    title: data.title,
+    aggregation: { uri: aggregationURI, contentType: "text/turtle" },
+    aggregated: [
+      { uri: data.resourceURI, title: data.title, format: data.format },
+    ],
+    profile: {
+      webId,
+      name: getThingName(userThing),
+      image: getUrl(userThing, VCARD.hasPhoto), // name of the current datapod owner
+    },
+    abstract: data.abstract,
+    keywords: [],
+    authors: authorThings.map((thing) => {
+      return { webId: asUrl(thing), name: getThingName(thing) };
+    }),
+    organizations: authorThings.map((thing) => {
+      return {
+        uri: "",
+        name: getStringNoLocale(thing, VCARD.organization_name),
+      };
+    }),
+  });
+
+  const savedLandingPageFile = await saveFileInContainer(
+    data.location,
+    new Blob([landingPageHTML], { type: "text/html" }),
+    {
+      slug: `landingpage-${`${randomizedUUID}-${data.file.name || ""}`}.html`,
+      contentType: "text/html",
+      fetch: fetchFunc,
+    }
+  );
+  const landingPageLocation = getSourceUrl(savedLandingPageFile);
+
+  // Update resourceMap to include link to landing page
+  updateThingPropertyInDataset(
+    fetchFunc,
+    resourceMapLocation,
+    resourceMapLocation,
+    LANDINGPAGEPREDICATE,
+    landingPageLocation,
+    setUrl
+  );
+
+  // Link the created resources
   if (resourceMapLocation) {
     // Update type index
     await linkArtefactToProfile(
@@ -92,6 +171,9 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
   // Set public read access to uploaded ORE metadata file
   if (resourceMapLocation)
     await createPublicReadAclIfNotExists(resourceMapLocation, fetchFunc);
+  // Set public read access for landing page
+  if (landingPageLocation)
+    await createPublicReadAclIfNotExists(landingPageLocation, fetchFunc);
 
   return { fileId: fileLocation, resourceMapURI: resourceMapLocation };
 }
@@ -306,14 +388,23 @@ export async function linkArtefactToProfile(
   return savedSolidDataset;
 }
 
-export async function postFileToContainer(fetchFunc, targetContainerURL, file) {
+export async function postFileToContainer(
+  fetchFunc,
+  targetContainerURL,
+  file,
+  randomizedUUID
+) {
   let location;
   const fetchFunction = fetchFunc || fetch;
   try {
     const savedFile = await saveFileInContainer(
       targetContainerURL, // Container URL
       file, // File
-      { slug: file.name, contentType: file.type, fetch: fetchFunction }
+      {
+        slug: ((randomizedUUID && `${randomizedUUID}-`) || "") + file.name,
+        contentType: file.type,
+        fetch: fetchFunction,
+      }
     );
     console.log(`File saved at ${getSourceUrl(savedFile)}`);
     return savedFile;
@@ -383,4 +474,67 @@ export async function createPublicReadAclIfNotExists(
     });
     await saveAclFor(resourceWithPerms, updatedAcl, { fetch: fetchFunction });
   }
+}
+
+// https://solid.github.io/specification/protocol#storage
+export async function getStorageRoot(url, fetchFunction) {
+  if (!url) return null;
+  // Clients can determine the storage of a resource by moving up the URI path hierarchy until the response includes a Link header with rel="type" targeting http://www.w3.org/ns/pim/space#Storage. Clients may check the root path of a URI for the storage claim at any time.
+  const spliturl = url.split("/");
+  let index = spliturl.length;
+  while (index > 0) {
+    const currentURL = `${spliturl.slice(0, index).join("/")}/`;
+    // eslint-disable-next-line no-await-in-loop
+    const response = await fetchFunction(currentURL, { method: "HEAD" });
+
+    const linkHeaders = response.headers.get("Link");
+    if (!linkHeaders || !linkHeaders.length) return "";
+    const links = LinkHeader.parse(linkHeaders);
+    for (const typeLink of links.get("rel", "type")) {
+      if (typeLink.uri === "http://www.w3.org/ns/pim/space#Storage") {
+        return currentURL;
+      }
+    }
+
+    // Fix to keep it from running towards http://
+    if (currentURL === getBaseIRI(url)) return null;
+    index -= 1;
+  }
+  return "";
+}
+
+function getThingName(thing) {
+  return (
+    getStringNoLocale(thing, VCARD.fn) || getStringNoLocale(thing, FOAF.name)
+  );
+}
+/**
+ *
+ * @param {Function} fetchFunction - An authenticated fetch function.
+ * @param {*} datasetURL - The URL of the dataset.
+ * @param {*} thingURL - The URL of the thing
+ * @param {*} predicate - The property to add / update on the thing
+ * @param {*} value - The value to update the property with
+ * @param {*} updateFunction - Function of the inrupt libs to update the thing with
+ */
+async function updateThingPropertyInDataset(
+  fetchFunction,
+  datasetURL,
+  thingURL,
+  predicate,
+  value,
+  updateFunction
+) {
+  let dataset = await getSolidDataset(datasetURL, { fetch: fetchFunction });
+  if (!dataset) throw new Error(`Could not load dataset at url: ${datasetURL}`);
+  let thing = getThing(dataset, thingURL);
+  if (!thing) throw new Error(`Could not load thing at url: ${thingURL}`);
+  thing = updateFunction(thing, predicate, value);
+  dataset = setThing(dataset, thing);
+  const savedSolidDataset = await saveSolidDatasetAt(
+    datasetURL,
+    dataset,
+    { fetch: fetchFunction } // fetch from authenticated Session
+  );
+  return savedSolidDataset;
 }

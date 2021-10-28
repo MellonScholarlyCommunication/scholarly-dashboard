@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from "react";
+import { useEffect } from "react";
 import {
   FOAF,
   RDF,
@@ -14,27 +14,41 @@ import { useRouter } from "next/router";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { postArtefactWithMetadata } from "../../utils/FileUtils";
-import { getBaseIRI } from "../../utils/util";
 import Modalify from "../modalify";
 import { ProfileCard } from "../profile";
+import useStorageRoot from "../../hooks/useStorageRoot";
 
 const ARTEFACTTYPE = "https://example.com/Artefact";
 
 function UploadComponent() {
   const { session } = useSession();
   const { webId } = session.info;
-  const defaultlocation = webId ? `${getBaseIRI(webId)}scholar/` : null;
+
+  const storageRoot = useStorageRoot();
   const router = useRouter();
 
-  const { register, handleSubmit, control } = useForm({
+  const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
       file: null,
       title: null,
       language: "en",
       abstract: null,
-      location: defaultlocation,
+      location: "",
     },
   });
+
+  useEffect(() => {
+    if (!storageRoot) return;
+    const defaultlocation = storageRoot ? `${storageRoot}scholar/` : null;
+    if (defaultlocation)
+      reset({
+        file: null,
+        title: null,
+        language: "en",
+        abstract: null,
+        location: defaultlocation,
+      });
+  }, [storageRoot, reset]);
 
   const {
     fields: authorsfields,
@@ -144,8 +158,7 @@ function UploadComponent() {
                               type="button"
                               onClick={() => authorsremove({ index })}
                             >
-                              {" "}
-                              Remove{" "}
+                              Remove
                             </Button>
                           </Grid>
                         )}
@@ -155,8 +168,7 @@ function UploadComponent() {
                               type="button"
                               onClick={() => authorsappend({ webId: "" })}
                             >
-                              {" "}
-                              Add{" "}
+                              Add
                             </Button>
                           </Grid>
                         )}
@@ -218,8 +230,7 @@ function UploadComponent() {
             <Grid item xs={5} />
             <Grid item xs={2}>
               <Button variant="outlined" type="submit">
-                {" "}
-                Submit{" "}
+                Submit
               </Button>
             </Grid>
             <Grid item xs={5} />

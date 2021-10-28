@@ -12,6 +12,8 @@ import { AS, LDP, RDF } from "@inrupt/vocab-common-rdf";
 import { postDatasetAtURLWithDefaultThing } from "./FileUtils";
 import { ORCHESTRATORPREDICATE } from "./util";
 
+export const ORIGINURL = "https://rubendedecker.be/mellon/dashboard";
+
 /**
  * Create notification body dataset
  * @param {type: string, actor: string, target: string, object: string} data
@@ -35,9 +37,7 @@ export async function createNotification(fetchFunc, data) {
         data.target
       )
     : null;
-  const originThing = buildThing(
-    createThing({ url: "https://mellon.com/dashboard" })
-  )
+  const originThing = buildThing(createThing({ url: ORIGINURL }))
     .addUrl(RDF.type, AS.Application)
     .addStringNoLocale(AS.name, "Mellon dashboard application")
     .build();
@@ -91,10 +91,18 @@ export async function sendNotification(fetchFunction, webId, dataset) {
     );
     return null;
   }
-  const inboxUrl = getUrl(
-    getThing(await getSolidDataset(target), target),
-    LDP.inbox
-  );
+  let inboxUrl = null;
+  try {
+    inboxUrl = getUrl(
+      getThing(await getSolidDataset(target), target),
+      LDP.inbox
+    );
+  } catch (e) {
+    alert(
+      "Could not find orchestrator to route message. Please initialize the orchestrator field on your profile."
+    );
+    return null;
+  }
   if (!inboxUrl) {
     alert(`Could not discover inbox for: ${target}`);
     return null;
