@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 import { useSession } from "@inrupt/solid-ui-react";
 import { useState, useEffect } from "react";
@@ -27,9 +28,9 @@ export default function useArtefacts(target, types) {
         target,
         usedTypes
       );
-      let ids = instances;
-      for (const container of containers) {
-        if (running)
+      let ids = instances || [];
+      for (const container of containers || []) {
+        if (running && container)
           ids = ids.concat(
             await getContainedResourceURLs(session.fetch, container)
           );
@@ -52,6 +53,8 @@ export default function useArtefacts(target, types) {
           await getArtefactMetadataThings(session.fetch, id),
         ])
       );
+      // Check artefact metadata object is found
+      artefactMappings = artefactMappings.filter((mapping) => !!mapping[1]);
       artefactMappings = new Map(artefactMappings);
       if (running) setArtefactMappings(artefactMappings);
     }

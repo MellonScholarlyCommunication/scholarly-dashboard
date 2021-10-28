@@ -128,8 +128,11 @@ function ArtefactCardComponent(props) {
   useEffect(() => {
     let running = true;
     async function fetchMetadata(artefactId) {
-      if (running)
-        setMetadata(await getArtefactMetadataThings(session.fetch, artefactId));
+      const artefactMetadata = await getArtefactMetadataThings(
+        session.fetch,
+        artefactId
+      );
+      if (running && artefactMetadata) setMetadata(artefactMetadata);
     }
     fetchMetadata(artefactId);
     return () => {
@@ -233,8 +236,11 @@ function ArtefactViewComponent(props) {
   useEffect(() => {
     let running = true;
     async function fetchMetadata(artefactId) {
-      if (running)
-        setMetadata(await getArtefactMetadataThings(session.fetch, artefactId));
+      const artefactMetadata = await getArtefactMetadataThings(
+        session.fetch,
+        artefactId
+      );
+      if (running && artefactMetadata) setMetadata(artefactMetadata);
     }
     fetchMetadata(artefactId);
     return () => {

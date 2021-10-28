@@ -335,16 +335,37 @@ export async function getArtefactMetadataThings(
   fetchFunc,
   artefactResourceMapId
 ) {
-  const resourceMapDataset = await getSolidDataset(artefactResourceMapId, {
-    fetch: fetchFunc,
-  });
-  const resourceMapThing = getThing(resourceMapDataset, artefactResourceMapId);
-
+  let resourceMapDataset;
+  let resourceMapThing;
+  let aggregationDataset;
+  let aggregationThing;
+  try {
+    resourceMapDataset = await getSolidDataset(artefactResourceMapId, {
+      fetch: fetchFunc,
+    });
+    if (!resourceMapDataset) return null;
+    resourceMapThing = getThing(resourceMapDataset, artefactResourceMapId);
+    if (!resourceMapThing) return null;
+  } catch (error) {
+    console.error(
+      `Could not retrieve resourceMap for ${artefactResourceMapId}`
+    );
+    return null;
+  }
   const aggregationId = getUrl(resourceMapThing, `${NS_ORE}describes`);
-  const aggregationDataset = await getSolidDataset(aggregationId, {
-    fetch: fetchFunc,
-  });
-  const aggregationThing = getThing(aggregationDataset, aggregationId);
+
+  try {
+    aggregationDataset = await getSolidDataset(aggregationId, {
+      fetch: fetchFunc,
+    });
+    if (!aggregationDataset) return null;
+
+    aggregationThing = getThing(aggregationDataset, aggregationId);
+    if (!aggregationThing) return null;
+  } catch (error) {
+    console.error(`Could not retrieve Aggregation for ${aggregationId}`);
+    return null;
+  }
 
   return {
     resourceMap: resourceMapThing,
