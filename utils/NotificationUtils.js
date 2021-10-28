@@ -73,10 +73,10 @@ export async function createNotification(fetchFunc, data) {
 }
 
 export async function sendNotification(fetchFunction, webId, dataset) {
-  let target = null;
+  let orchestratorWebId = null;
   try {
-    target = getUrl(
-      getThing(await getSolidDataset(webId), webId),
+    orchestratorWebId = getUrl(
+      getThing(await getSolidDataset(webId, { fetch: fetchFunction }), webId),
       ORCHESTRATORPREDICATE
     );
   } catch (e) {
@@ -85,7 +85,7 @@ export async function sendNotification(fetchFunction, webId, dataset) {
     );
     return null;
   }
-  if (!target) {
+  if (!orchestratorWebId) {
     alert(
       "Could not find orchestrator to route message. Please initialize the orchestrator field on your profile."
     );
@@ -94,7 +94,10 @@ export async function sendNotification(fetchFunction, webId, dataset) {
   let inboxUrl = null;
   try {
     inboxUrl = getUrl(
-      getThing(await getSolidDataset(target), target),
+      getThing(
+        await getSolidDataset(orchestratorWebId, { fetch: fetchFunction }),
+        orchestratorWebId
+      ),
       LDP.inbox
     );
   } catch (e) {
@@ -104,7 +107,7 @@ export async function sendNotification(fetchFunction, webId, dataset) {
     return null;
   }
   if (!inboxUrl) {
-    alert(`Could not discover inbox for: ${target}`);
+    alert(`Could not discover inbox for: ${orchestratorWebId}`);
     return null;
   }
   const response = await postDatasetAtURLWithDefaultThing(
@@ -117,7 +120,7 @@ export async function sendNotification(fetchFunction, webId, dataset) {
   if (response) {
     alert(`Notification sent to: ${inboxUrl}`);
   } else {
-    alert(`Could not send notification to: ${inboxUrl}` || target);
+    alert(`Could not send notification to: ${inboxUrl || orchestratorWebId}`);
   }
   return response;
 }
