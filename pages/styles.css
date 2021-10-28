@@ -57,6 +57,11 @@ body,
   width: 85%;
 }
 
+.valueParent > select {
+  width: 85%;
+}
+
+
 #drawer > div {
   overflow-y: scroll;
 }

@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-bitwise */
 /**
  * Copyright 2021 Inrupt Inc.
  *
@@ -19,22 +21,64 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
+import { useState } from "react";
 import {
   createStyles,
   makeStyles,
   LinkButton,
+  Label,
 } from "@inrupt/prism-react-components";
 import { useBem } from "@solid/lit-prism-patterns";
 import Link from "next/link";
 
 import { useSession, LogoutButton } from "@inrupt/solid-ui-react";
-import LoginForm from "../loginForm";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import styles from "./styles";
+import LoginForm from "../loginForm";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 export const TESTCAFE_ID_HEADER_LOGO = "header-banner-logo";
+
+const stringToColour = function (str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i += 1) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let colour = "#";
+  for (let i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    colour += `00${value.toString(16)}`.substr(-2);
+  }
+  return colour;
+};
+
+function invertColor(hex) {
+  if (hex.indexOf("#") === 0) {
+    hex = hex.slice(1);
+  }
+  // convert 3-digit hex to 6-digits.
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
+  if (hex.length !== 6) {
+    throw new Error("Invalid HEX color.");
+  }
+  // invert color components
+  const r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16);
+  const g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16);
+  const b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
+  // pad each with zeros and return
+  return `#${padZero(r)}${padZero(g)}${padZero(b)}`;
+}
+
+function padZero(str, len) {
+  len = len || 2;
+  const zeros = new Array(len).join("0");
+  return (zeros + str).slice(-len);
+}
 
 export default function Header() {
   const { session, sessionRequestInProgress } = useSession();
@@ -43,43 +87,80 @@ export default function Header() {
   const bem = useBem(useStyles());
   const classes = useStyles();
 
+  const colorHex = webId ? stringToColour(webId) : "#FFFFFF";
+  const textColorHex = invertColor(colorHex);
+
+  const [open, setOpen] = useState(false);
+
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setOpen(true);
+    navigator.clipboard.writeText(webId);
+  };
+
   return (
     <header
       className={bem("header-banner")}
-      style={{ position: "fixed", width: "100vw" }}
+      style={{ position: "fixed", width: "100vw", backgroundColor: colorHex }}
     >
       <div className={classes.logoContainer}>
-        <Link href="/">
-          <a data-testid={TESTCAFE_ID_HEADER_LOGO}>
-            <img
-              height={40}
-              src="/inrupt_logo-2020.svg"
-              className={bem("header-banner__logo-image")}
-              alt="Inrupt PodBrowser"
-            />
-          </a>
-        </Link>
+        {webId && (
+          <ClickAwayListener onClickAway={handleTooltipClose}>
+            <div>
+              <Tooltip
+                PopperProps={{
+                  disablePortal: true,
+                }}
+                onClose={handleTooltipClose}
+                open={open}
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                title="Copied webId to clipboard"
+              >
+                <Button
+                  onClick={handleTooltipOpen}
+                  style={{
+                    fontWeight: "bold",
+                    textTransform: "initial",
+                    color: textColorHex,
+                  }}
+                >
+                  Logged in as: {webId}
+                </Button>
+              </Tooltip>
+            </div>
+          </ClickAwayListener>
+        )}
       </div>
 
       <div
         className={bem("header-banner__main-nav")}
         style={{ display: "flex", alignItems: "center" }}
-      >
-        {webId && (
-          <label style={{ marginLeft: "auto" }}>Logged in as: {webId}</label>
-        )}
-      </div>
+      />
       <div className={bem("user-menu")}>
         {!sessionRequestInProgress && session.info.isLoggedIn && (
           <LogoutButton
             onError={console.error}
             onLogout={() => window.location.reload()}
+            style={{ backgroundColor: colorHex }}
           >
             <LinkButton
               variant="small"
               className={bem("user-menu__list-item-trigger")}
+              style={{ backgroundColor: colorHex }}
             >
-              Log Out
+              <Label
+                onClick={handleTooltipOpen}
+                style={{
+                  color: textColorHex,
+                }}
+              >
+                Log Out
+              </Label>
             </LinkButton>
           </LogoutButton>
         )}
