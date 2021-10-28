@@ -133,10 +133,6 @@ export function CreateEventView() {
     await sendNotification(session.fetch, webId, notificationDataset);
   }
 
-  const handleOnChange = (e) => {
-    const val = e.target.value;
-  };
-
   const objectSelections = Array.from(artefactMappings.entries()).map(
     (entry) => {
       return {
@@ -187,7 +183,6 @@ export function CreateEventView() {
                   list="objectList"
                   label="label"
                   {...register("object", { required: true })}
-                  onChange={handleOnChange}
                 />
                 <datalist id="objectList">
                   {objectSelections.map((selection) => (
@@ -214,7 +209,6 @@ export function CreateEventView() {
                   list="targetList"
                   label="label"
                   {...register("target", { required: true })}
-                  onChange={handleOnChange}
                 />
                 <datalist id="targetList">
                   {contacts.map((contactWebId) => (
