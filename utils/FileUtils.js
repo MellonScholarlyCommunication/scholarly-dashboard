@@ -28,7 +28,8 @@ import { SOLID } from "@inrupt/vocab-solid";
 import { AS, FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
 import DataFactory from "@rdfjs/data-model";
 import rdfSerializer from "rdf-serialize";
-import { getBaseIRI, getQuadsFromDataset, NS_ORE } from "./util";
+import * as jsonld from "jsonld";
+import { createUUID, getBaseIRI, getQuadsFromDataset, NS_ORE } from "./util";
 // eslint-disable-next-line import/no-cycle
 import { createNotification, sendNotification } from "./NotificationUtils";
 import {
@@ -55,7 +56,6 @@ export const LANDINGPAGEPREDICATE = "https://mellon.org/ns/landingPage";
  * @returns
  */
 export async function postArtefactWithMetadata(fetchFunc, webId, data) {
-  console.log("posting with metadata", data);
   // TODO Validation
   const randomizedUUID = Math.floor(1000 + Math.random() * 9000);
 
@@ -154,6 +154,7 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
 
   // Send Notification
   const notificationData = {
+    id: createUUID,
     type: AS.Create,
     actor: webId,
     object: resourceMapLocation,
@@ -162,7 +163,7 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
     fetchFunc,
     notificationData
   );
-  sendNotification(fetchFunc, webId, notificationDataset);
+  sendNotification(fetchFunc, webId, notificationDataset, notificationData.id);
 
   // Set access to newly created items
   // Set public read access to uploaded artefact
@@ -187,31 +188,48 @@ export async function postDatasetAtURLWithDefaultThing(
   fetchFunction,
   dataset,
   containerURL,
-  defaultName,
-  contentType
+  // defaultName,
+  contentType,
+  notificationId
 ) {
-  let datasetQuads = getQuadsFromDataset(dataset);
+  const datasetQuads = getQuadsFromDataset(dataset);
   // Process quads to map default URL on the url of the to be posted thing
-  const defaultNamedNode = DataFactory.namedNode("");
-  defaultName = DEFAULTNAMEPREFIX + defaultName;
-  datasetQuads = datasetQuads.map((q) => {
-    if (q.subject.value === defaultName) {
-      q.subject = defaultNamedNode;
-    }
-    if (q.object.value === defaultName) {
-      q.object = defaultNamedNode;
-    }
-    return q;
-  });
+  // const defaultNamedNode = DataFactory.namedNode("");
+  // defaultName = DEFAULTNAMEPREFIX + defaultName;
+  // datasetQuads = datasetQuads.map((q) => {
+  //   if (q.subject.value === defaultName) {
+  //     q.subject = defaultNamedNode;
+  //   }
+  //   if (q.object.value === defaultName) {
+  //     q.object = defaultNamedNode;
+  //   }
+  //   return q;
+  // });
   const quadStream = streamifyArray(datasetQuads);
   const textStream = rdfSerializer.serialize(quadStream, {
     contentType,
   });
-  const stringRepresentation = await stringifyStream(textStream);
+
+  let notificationString = await stringifyStream(textStream);
+
+  // Try to frame jsonld notification
+  if (contentType === "application/ld+json" && notificationId) {
+    try {
+      const frame = {
+        "@id": notificationId,
+      };
+
+      const framed = await jsonld.frame(JSON.parse(notificationString), frame);
+      notificationString = JSON.stringify(framed, null, 2);
+
+      // eslint-disable-next-line no-empty
+    } catch (_ignored) {}
+  }
+
   return await fetchFunction(containerURL, {
     method: "POST",
     headers: { "Content-Type": contentType },
-    body: stringRepresentation,
+    body: notificationString,
   });
 }
 
@@ -427,7 +445,6 @@ export async function postFileToContainer(
         fetch: fetchFunction,
       }
     );
-    console.log(`File saved at ${getSourceUrl(savedFile)}`);
     return savedFile;
   } catch (error) {
     console.error(error);

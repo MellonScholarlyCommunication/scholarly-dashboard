@@ -19,7 +19,7 @@ import {
   LANDINGPAGEPREDICATE,
   LINKTYPE,
 } from "../../utils/FileUtils";
-import { NS_DCMI } from "../../utils/util";
+import { NS_DCMI, openInNewTab } from "../../utils/util";
 
 export const ARTEFACTTYPES = [LINKTYPE];
 
@@ -27,7 +27,7 @@ function getRemoteValueLink(thingUrl, property, id = 1) {
   return (
     <DatasetProvider datasetUrl={thingUrl} key={`remotevalue${property}${id}`}>
       <ThingProvider thingUrl={thingUrl}>
-        <a href={thingUrl}>
+        <a href={thingUrl} target="_blank" rel="noopener noreferrer">
           <Value property={property} />
         </a>
       </ThingProvider>
@@ -213,7 +213,7 @@ function ArtefactCardComponent(props) {
               {landingPageURI && (
                 <Button
                   style={{ backgroundColor: "lightblue" }}
-                  onClick={() => window.open(landingPageURI)}
+                  onClick={() => openInNewTab(landingPageURI)}
                 >
                   Open Landing Page
                 </Button>
@@ -303,7 +303,7 @@ function ArtefactViewComponent(props) {
               {landingPageURI && (
                 <Button
                   style={{ backgroundColor: "lightblue" }}
-                  onClick={() => window.open(landingPageURI)}
+                  onClick={() => openInNewTab(landingPageURI)}
                 >
                   Open Landing Page
                 </Button>
@@ -316,7 +316,11 @@ function ArtefactViewComponent(props) {
                     <Grid item xs={12} sm={6} md={6} lg={4}>
                       <Card>
                         <CardContent>
-                          <a href={instanceThing.url}>
+                          <a
+                            href={instanceThing.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <Value
                               property={DCTERMS.title}
                               thing={instanceThing}
@@ -343,7 +347,8 @@ function ArtefactViewComponent(props) {
                             6
                           )}
                           <Button
-                            onClick={() => window.open(instanceThing.url)}
+                            style={{ backgroundColor: "lightblue" }}
+                            onClick={() => openInNewTab(instanceThing.url)}
                           >
                             Open
                           </Button>

@@ -41,6 +41,7 @@
     "@solid/lit-term": "^0.4.1",
     "eslint-plugin-header": "^3.1.1",
     "http-link-header": "^1.0.3",
+    "jsonld": "^5.2.0",
     "jss-preset-default": "^10.7.1",
     "next": "^11.0.1",
     "rdf-quad": "^1.5.0",
@@ -54,7 +55,8 @@
     "replace-in-file": "^6.3.1",
     "solid-client": "^0.24.3",
     "stream-to-string": "^1.2.0",
-    "streamify-array": "^1.0.1"
+    "streamify-array": "^1.0.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.2.0-alpha.1",

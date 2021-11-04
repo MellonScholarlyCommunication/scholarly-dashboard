@@ -1,3 +1,5 @@
+import { v4 } from "uuid";
+
 const DataFactory = require("@rdfjs/data-model");
 
 export const ORCHESTRATORPREDICATE = "https://example.com/ns/orchestrator";
@@ -121,18 +123,6 @@ export function subjectToRdfJsQuads(
   return quads;
 }
 
-function isLocalNodeIri(iri) {
-  return (
-    iri.substring(0, localNodeSkolemPrefix.length) === localNodeSkolemPrefix
-  );
-}
-function getLocalNodeName(localNodeIri) {
-  return localNodeIri.substring(localNodeSkolemPrefix.length);
-}
-function getLocalNodeIri(localNodeName) {
-  return `${localNodeSkolemPrefix}${localNodeName}`;
-}
-
 function isBlankNodeId(value) {
   return typeof value === "string" && value.substring(0, 2) === "_:";
 }
@@ -141,6 +131,11 @@ function getBlankNodeValue(blankNodeId) {
   return blankNodeId.substring(2);
 }
 
-function getBlankNodeId(blankNode) {
-  return `_:${blankNode.value}`;
+export function createUUID() {
+  return `urn:uuid:${v4()}`;
+}
+
+export function openInNewTab(url) {
+  const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+  if (newWindow) newWindow.opener = null;
 }

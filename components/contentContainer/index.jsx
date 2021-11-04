@@ -32,7 +32,7 @@ function ContentContainer() {
       : router.query.uri;
   target = target || webId;
 
-  const { thing, error } = useThing(target, target);
+  const { thing, error } = useThing(target, target, { fetch: session.fetch });
 
   let types;
   let person;

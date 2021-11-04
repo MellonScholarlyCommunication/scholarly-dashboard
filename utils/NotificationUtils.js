@@ -1,3 +1,4 @@
+import { FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
 import {
   buildThing,
   createSolidDataset,
@@ -6,6 +7,8 @@ import {
   getThing,
   createThing,
   getUrl,
+  asUrl,
+  getStringNoLocale,
 } from "@inrupt/solid-client";
 import { AS, LDP, RDF } from "@inrupt/vocab-common-rdf";
 // eslint-disable-next-line import/no-cycle
@@ -13,17 +16,52 @@ import { postDatasetAtURLWithDefaultThing } from "./FileUtils";
 import { ORCHESTRATORPREDICATE } from "./util";
 
 export const ORIGINURL = "https://rubendedecker.be/mellon/dashboard";
+export const NOTIFICATIONCONTENTTYPE = "application/ld+json";
+
+function buildPersonThing(thing) {
+  const inbox = getUrl(thing, LDP.inbox) || getUrl(thing, AS.inbox) || "";
+  const name =
+    getStringNoLocale(thing, FOAF.name) || getStringNoLocale(thing, VCARD.fn);
+  const orgname = getStringNoLocale(thing, VCARD.organization_name);
+
+  let newThing = buildThing(createThing({ url: asUrl(thing) })).addUrl(
+    RDF.type,
+    AS.Person
+  );
+  if (name) newThing = newThing.addStringNoLocale(AS.name, name);
+  if (inbox) newThing = newThing.addUrl(`${AS.NAMESPACE}inbox`, inbox);
+  if (orgname)
+    newThing = newThing.addStringNoLocale(VCARD.organization_name, orgname);
+  return newThing.build();
+}
+function buildServiceThing(thing) {
+  const inbox = getUrl(thing, LDP.inbox) || getUrl(thing, AS.inbox) || "";
+  const name =
+    getStringNoLocale(thing, FOAF.name) || getStringNoLocale(thing, VCARD.fn);
+
+  let newThing = buildThing(createThing({ url: asUrl(thing) })).addUrl(
+    RDF.type,
+    AS.Service
+  );
+  if (name) newThing = newThing.addStringNoLocale(AS.name, name);
+  if (inbox) newThing = newThing.addUrl(`${AS.NAMESPACE}inbox`, inbox);
+  return newThing.build();
+}
 
 /**
  * Create notification body dataset
  * @param {type: string, actor: string, target: string, object: string} data
  */
 export async function createNotification(fetchFunc, data) {
-  const actorThing = data.actor
+  const actorOriginalThing = data.actor
     ? getThing(
         await getSolidDataset(data.actor, { fetch: fetchFunc }),
         data.actor
       )
+    : null;
+
+  const actorThing = actorOriginalThing
+    ? buildPersonThing(actorOriginalThing)
     : null;
   const objectThing = data.object
     ? getThing(
@@ -31,12 +69,19 @@ export async function createNotification(fetchFunc, data) {
         data.object
       )
     : null;
-  const targetThing = data.target
+  const targetOriginalThing = data.target
     ? getThing(
         await getSolidDataset(data.target, { fetch: fetchFunc }),
         data.target
       )
     : null;
+  const targetType =
+    targetOriginalThing && getUrl(targetOriginalThing, RDF.type);
+  const targetThing =
+    targetType && targetType === FOAF.person
+      ? buildPersonThing(targetOriginalThing)
+      : buildServiceThing(targetOriginalThing);
+
   const originThing = buildThing(createThing({ url: ORIGINURL }))
     .addUrl(RDF.type, AS.Application)
     .addStringNoLocale(AS.name, "Mellon dashboard application")
@@ -44,9 +89,10 @@ export async function createNotification(fetchFunc, data) {
 
   // Create a new SolidDataset for Writing 101
   let notificationDataset = createSolidDataset();
-  let notificationThing = buildThing(
-    createThing({ name: "notification" })
-  ).addUrl(RDF.type, data.type);
+  let notificationThing = buildThing(createThing({ url: data.id })).addUrl(
+    RDF.type,
+    data.type
+  );
 
   if (actorThing)
     notificationThing = notificationThing.setIri(AS.actor, actorThing);
@@ -72,7 +118,12 @@ export async function createNotification(fetchFunc, data) {
   return notificationDataset;
 }
 
-export async function sendNotification(fetchFunction, webId, dataset) {
+export async function sendNotification(
+  fetchFunction,
+  webId,
+  dataset,
+  notificationId
+) {
   let orchestratorWebId = null;
   try {
     orchestratorWebId = getUrl(
@@ -114,8 +165,8 @@ export async function sendNotification(fetchFunction, webId, dataset) {
     fetchFunction,
     dataset,
     inboxUrl,
-    "notification",
-    "text/turtle"
+    NOTIFICATIONCONTENTTYPE,
+    notificationId // "text/turtle"
   );
   if (response) {
     alert(`Notification sent to: ${inboxUrl}`);

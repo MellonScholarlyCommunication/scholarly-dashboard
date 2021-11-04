@@ -81,14 +81,22 @@ function EventCardComponent(props) {
           }}
         >
           <small>
-            <a href={id}>{id}</a>
+            <a href={id} target="_blank" rel="noopener noreferrer">
+              {id}
+            </a>
           </small>
 
           {getProp(event, "title")}
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
             Type
-            <a href={getProp(event, "type")}>{getProp(event, "type")}</a>
+            <a
+              href={getProp(event, "type")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {getProp(event, "type")}
+            </a>
           </CardContent>
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
@@ -98,7 +106,13 @@ function EventCardComponent(props) {
 
           <CardContent style={{ margin: ".25em", padding: ".25em" }}>
             Object
-            <a href={getProp(event, "object")}>{getProp(event, "object")}</a>
+            <a
+              href={getProp(event, "object")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {getProp(event, "object")}
+            </a>
           </CardContent>
         </Card>
       )}

@@ -25,6 +25,7 @@ import {
 } from "../../utils/NotificationUtils";
 import useNotifications from "../../hooks/useNotifications";
 import useContacts from "../../hooks/useContacts";
+import { createUUID } from "../../utils/util";
 
 const NOTIFICATIONTYPES = [
   { label: "Offer", value: AS.Offer },
@@ -57,7 +58,13 @@ function createLabelledValue(label, property, thing) {
         {label}
       </Grid>
       <Grid item sm={9} xs={12}>
-        <a href={getUrl(thing, property)}>{getUrl(thing, property)}</a>
+        <a
+          href={getUrl(thing, property)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {getUrl(thing, property)}
+        </a>
       </Grid>
     </Grid>
   );
@@ -124,13 +131,18 @@ export function CreateEventView() {
       return;
     }
 
-    const finalData = { ...data, actor: webId };
-    console.log("FINALDATA", finalData);
+    const finalData = { ...data, actor: webId, id: createUUID() };
     const notificationDataset = await createNotification(
       session.fetch,
       finalData
     );
-    await sendNotification(session.fetch, webId, notificationDataset);
+
+    await sendNotification(
+      session.fetch,
+      webId,
+      notificationDataset,
+      finalData.id
+    );
   }
 
   const objectSelections = Array.from(artefactMappings.entries()).map(
