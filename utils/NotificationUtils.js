@@ -19,9 +19,11 @@ export const ORIGINURL = "https://rubendedecker.be/mellon/dashboard";
 export const NOTIFICATIONCONTENTTYPE = "application/ld+json";
 
 function buildPersonThing(thing) {
-  const inbox = getUrl(thing, LDP.inbox) || getUrl(thing, AS.inbox) || "";
+  const inbox = getUrl(thing, LDP.inbox) || "";
   const name =
-    getStringNoLocale(thing, FOAF.name) || getStringNoLocale(thing, VCARD.fn);
+    getStringNoLocale(thing, FOAF.name) ||
+    getStringNoLocale(thing, VCARD.fn) ||
+    "";
   const orgname = getStringNoLocale(thing, VCARD.organization_name);
 
   let newThing = buildThing(createThing({ url: asUrl(thing) })).addUrl(
@@ -29,13 +31,13 @@ function buildPersonThing(thing) {
     AS.Person
   );
   if (name) newThing = newThing.addStringNoLocale(AS.name, name);
-  if (inbox) newThing = newThing.addUrl(`${AS.NAMESPACE}inbox`, inbox);
+  if (inbox) newThing = newThing.addUrl(LDP.inbox, inbox);
   if (orgname)
     newThing = newThing.addStringNoLocale(VCARD.organization_name, orgname);
   return newThing.build();
 }
 function buildServiceThing(thing) {
-  const inbox = getUrl(thing, LDP.inbox) || getUrl(thing, AS.inbox) || "";
+  const inbox = getUrl(thing, LDP.inbox) || "";
   const name =
     getStringNoLocale(thing, FOAF.name) || getStringNoLocale(thing, VCARD.fn);
 
@@ -44,7 +46,7 @@ function buildServiceThing(thing) {
     AS.Service
   );
   if (name) newThing = newThing.addStringNoLocale(AS.name, name);
-  if (inbox) newThing = newThing.addUrl(`${AS.NAMESPACE}inbox`, inbox);
+  if (inbox) newThing = newThing.addUrl(LDP.inbox, inbox);
   return newThing.build();
 }
 
