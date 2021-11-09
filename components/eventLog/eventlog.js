@@ -79,6 +79,35 @@ export async function getEventIds(fetchFunction, uri, artefactId) {
   return eventIds;
 }
 
+const EVENTTYPES = [
+  AS.Announce,
+  AS.Offer,
+  AS.Accept,
+  AS.Reject,
+  AS.Undo,
+  AS.Create,
+  AS.Update,
+  AS.Delete,
+].map((e) => e.toString());
+export async function getEventThings(fetchFunction, eventId) {
+  const dataset = await getSolidDataset(eventId, { fetch: fetchFunction });
+  if (!dataset) return null;
+  const things = getThingAll(dataset);
+  if (!things) return null;
+  const eventThings = [];
+  for (const thing of things) {
+    const typeUrls = getUrlAll(thing, RDF.type);
+    for (const type of typeUrls) {
+      if (EVENTTYPES.indexOf(type) !== -1) {
+        eventThings.push(thing);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+    }
+  }
+  return eventThings;
+}
+
 export async function getEventData(fetchFunction, uri) {
   const dataset = await getSolidDataset(uri, { fetch: fetchFunction });
   const things = getThingAll(dataset, uri);

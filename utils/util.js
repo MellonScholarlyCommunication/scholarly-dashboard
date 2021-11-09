@@ -1,3 +1,4 @@
+import { AS, FOAF } from "@inrupt/lit-generated-vocab-common";
 import { v4 } from "uuid";
 
 const DataFactory = require("@rdfjs/data-model");
@@ -5,6 +6,15 @@ const DataFactory = require("@rdfjs/data-model");
 export const ORCHESTRATORPREDICATE = "https://example.com/ns/orchestrator";
 export const NS_ORE = "http://www.openarchives.org/ore/terms/";
 export const NS_DCMI = "http://purl.org/dc/elements/1.1/";
+
+export const NOTIFICATIONTYPES = [
+  AS.Offer,
+  AS.Announce,
+  AS.Accept,
+  AS.Reject,
+  AS.Undo,
+].map((e) => e.toString());
+export const PERSONTYPES = [FOAF.Person, AS.Person].map((e) => e.toString());
 
 export function getBaseIRI(IRI) {
   let path = IRI;
@@ -138,4 +148,11 @@ export function createUUID() {
 export function openInNewTab(url) {
   const newWindow = window.open(url, "_blank", "noopener,noreferrer");
   if (newWindow) newWindow.opener = null;
+}
+
+export function getPredicateName(predicate) {
+  let split = predicate && predicate.split("/");
+  const name = split[split.length - 1];
+  split = name && name.split("#");
+  return split[split.length - 1];
 }

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react/jsx-curly-newline */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
@@ -17,7 +18,6 @@ import {
   getUrl,
 } from "@inrupt/solid-client";
 import { useEffect, useState } from "react";
-// import { Autocomplete } from "@mui/material";
 import useArtefacts from "../../hooks/useArtefacts";
 import {
   createNotification,
