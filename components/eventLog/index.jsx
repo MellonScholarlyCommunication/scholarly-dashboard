@@ -11,21 +11,21 @@ import { getEventData, getEventIds } from "./eventlog";
 function EventListingComponent(props) {
   const { session } = useSession();
   const { webId } = session.info;
-  const { target, small } = props;
+  const { target, artefactId, small } = props;
   const [ids, setIds] = useState(null); // List of event URIs
   const targetWebId = target || webId;
 
   useEffect(() => {
     let running = true;
     async function effect() {
-      const ids = await getEventIds(session.fetch, targetWebId);
+      const ids = await getEventIds(session.fetch, targetWebId, artefactId);
       if (running) setIds(ids);
     }
     effect();
     return () => {
       running = false;
     };
-  }, [session.fetch, targetWebId]);
+  }, [artefactId, session.fetch, targetWebId]);
 
   function getContents() {
     if (!ids) {

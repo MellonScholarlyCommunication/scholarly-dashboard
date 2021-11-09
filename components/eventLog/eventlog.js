@@ -6,6 +6,7 @@ import {
   getUrlAll,
   getThingAll,
   asUrl,
+  getUrl,
 } from "@inrupt/solid-client";
 
 import { AS, RDF } from "@inrupt/vocab-common-rdf";
@@ -30,7 +31,21 @@ async function discoverBodyAuthorLinks(fetchFunction, uri) {
   return [...new Set(results)];
 }
 
-export async function getEventIds(fetchFunction, uri) {
+async function checkEventMatchesArtefact(eventId, artefactId, fetchFunction) {
+  const dataset = await getSolidDataset(eventId, { fetch: fetchFunction });
+  if (!dataset) return false;
+  const things = getThingAll(dataset);
+  if (!things) return false;
+  for (const thing of things) {
+    const url = getUrl(thing, AS.object);
+    if (url && url === artefactId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function getEventIds(fetchFunction, uri, artefactId) {
   if (!uri) return [];
   // Check Headers
   // TODO:: discoverLinkHeaders(fetchFunction, uri)
@@ -50,6 +65,15 @@ export async function getEventIds(fetchFunction, uri) {
     eventIds = eventIds.concat(
       await getContainedResourceURLs(fetchFunction, eventLogId)
     );
+  }
+
+  if (artefactId) {
+    const matchingIds = [];
+    for (const eventId of eventIds) {
+      if (await checkEventMatchesArtefact(eventId, artefactId, fetchFunction))
+        matchingIds.push(eventId);
+    }
+    return matchingIds;
   }
 
   return eventIds;
