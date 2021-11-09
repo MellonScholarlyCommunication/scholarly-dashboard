@@ -32,8 +32,11 @@ function ContentContainer() {
       : router.query.uri;
   target = target || webId;
 
-  const { thing, error } = useThing(target, target, { fetch: session.fetch });
+  console.log("Loading content");
 
+  const { thing, error } = useThing(target, target);
+
+  console.log("Loaded content", thing);
   let types;
   let person;
   let artefact;

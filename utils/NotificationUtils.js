@@ -37,6 +37,7 @@ function buildPersonThing(thing) {
   return newThing.build();
 }
 function buildServiceThing(thing) {
+  if (!thing) return null;
   const inbox = getUrl(thing, LDP.inbox) || "";
   const name =
     getStringNoLocale(thing, FOAF.name) || getStringNoLocale(thing, VCARD.fn);
@@ -79,10 +80,14 @@ export async function createNotification(fetchFunc, data) {
     : null;
   const targetType =
     targetOriginalThing && getUrl(targetOriginalThing, RDF.type);
-  const targetThing =
-    targetType && targetType === FOAF.person
-      ? buildPersonThing(targetOriginalThing)
-      : buildServiceThing(targetOriginalThing);
+
+  let targetThing = null;
+  if (targetType) {
+    targetThing =
+      targetType === FOAF.Person.toString()
+        ? buildPersonThing(targetOriginalThing)
+        : buildServiceThing(targetOriginalThing);
+  }
 
   const originThing = buildThing(createThing({ url: ORIGINURL }))
     .addUrl(RDF.type, AS.Application)
@@ -126,6 +131,10 @@ export async function sendNotification(
   dataset,
   notificationId
 ) {
+  if (!dataset) {
+    alert("Could not generate notification message", dataset);
+    return null;
+  }
   let orchestratorWebId = null;
   try {
     orchestratorWebId = getUrl(

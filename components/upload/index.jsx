@@ -61,7 +61,7 @@ function UploadComponent() {
   const onSubmit = async (submission) => {
     const formattedSubmission = { ...submission };
     formattedSubmission.type = ARTEFACTTYPE;
-    formattedSubmission.format = submission.file[0].type;
+    formattedSubmission.format = submission.file && submission.file[0].type;
     // setting file to first file of fileList
     formattedSubmission.file =
       submission.file && submission.file.length && submission.file[0];

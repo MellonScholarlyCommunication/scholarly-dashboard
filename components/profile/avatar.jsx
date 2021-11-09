@@ -18,9 +18,9 @@ import { Input } from "@inrupt/prism-react-components";
 export default function ProfileAvatar(props) {
   const { edit, size } = props;
   const { solidDataset: dataset, setDataset } = useContext(DatasetContext);
-  const datasetUrl = getSourceUrl(dataset);
+  const thingURL = getSourceUrl(dataset);
   const { fetch } = useContext(SessionContext);
-  let { thing } = useThing(datasetUrl);
+  let { thing } = useThing(thingURL, thingURL);
   const profileImageURL = thing && getUrl(thing, VCARD.hasPhoto);
 
   const [imageURL, setImageURL] = useState(profileImageURL);

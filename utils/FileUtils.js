@@ -123,7 +123,9 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
     data.location,
     new Blob([landingPageHTML], { type: "text/html" }),
     {
-      slug: `landingpage-${`${randomizedUUID}-${data.file.name || ""}`}.html`,
+      slug: `landingpage-${`${randomizedUUID}-${
+        data.file.name.split(".")[0] || ""
+      }`}.html`,
       contentType: "text/html",
       fetch: fetchFunc,
     }
@@ -154,7 +156,7 @@ export async function postArtefactWithMetadata(fetchFunc, webId, data) {
 
   // Send Notification
   const notificationData = {
-    id: createUUID,
+    id: createUUID(),
     type: AS.Create,
     actor: webId,
     object: resourceMapLocation,
@@ -286,7 +288,7 @@ export async function createFolderRecursiveIfNotExists(
 
   let resourceInfo = null;
   try {
-    resourceInfo = await getResourceInfo(folderURI);
+    resourceInfo = await getResourceInfo(folderURI, { fetch: fetchFunction });
   } catch (_ignored) {
     resourceInfo = null;
   }

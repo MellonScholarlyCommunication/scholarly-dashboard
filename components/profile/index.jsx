@@ -131,7 +131,7 @@ export function ProfileCard(props) {
   const target = uri || webId;
   const width = maxWidth || "100%";
 
-  const { thing, error } = useThing(target);
+  const { thing, error } = useThing(target, target);
 
   function createCardLabel(label, size) {
     return (
