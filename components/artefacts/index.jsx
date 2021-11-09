@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-curly-newline */
 /* eslint-disable no-underscore-dangle */
 import {
   DatasetProvider,
@@ -67,6 +68,7 @@ function ArtefactListingComponent(props) {
   const { session } = useSession();
   const { webId } = session.info;
   const [artefactIds, setArtefactIds] = useState(null); // List of artefact URIs
+  const [unavailableArtefacts, setUnavailableArtefacts] = useState([]); // List of artefact URIs
 
   useEffect(() => {
     const targetWebId = target || webId;
@@ -99,18 +101,25 @@ function ArtefactListingComponent(props) {
     if (artefactIds && artefactIds.length === 0) {
       return <label>No Artefacts could be found</label>;
     }
-    return artefactIds.map((id) => (
-      <Grid
-        item
-        lg={small ? 6 : 4}
-        md={6}
-        sm={6}
-        xs={12}
-        key={`artefactcard${id}`}
-      >
-        <ArtefactCardComponent artefactId={id} />
-      </Grid>
-    ));
+    return artefactIds
+      .filter((id) => unavailableArtefacts.indexOf(id) === -1)
+      .map((id) => (
+        <Grid
+          item
+          lg={small ? 6 : 4}
+          md={6}
+          sm={6}
+          xs={12}
+          key={`artefactcard${id}`}
+        >
+          <ArtefactCardComponent
+            artefactId={id}
+            noData={() =>
+              setUnavailableArtefacts(unavailableArtefacts.concat(id))
+            }
+          />
+        </Grid>
+      ));
   }
 
   return (
@@ -122,7 +131,7 @@ function ArtefactListingComponent(props) {
 
 function ArtefactCardComponent(props) {
   const { session } = useSession();
-  const { artefactId } = props;
+  const { artefactId, noData } = props;
 
   const [metadata, setMetadata] = useState(null);
   useEffect(() => {
@@ -133,12 +142,13 @@ function ArtefactCardComponent(props) {
         artefactId
       );
       if (running && artefactMetadata) setMetadata(artefactMetadata);
+      if (running && !artefactMetadata) noData();
     }
     fetchMetadata(artefactId);
     return () => {
       running = false;
     };
-  }, [artefactId, session.fetch]);
+  }, [artefactId, noData, session.fetch]);
 
   const landingPageURI =
     metadata && getUrl(metadata.resourceMap, LANDINGPAGEPREDICATE);
