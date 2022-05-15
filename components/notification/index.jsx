@@ -248,13 +248,13 @@ function LoadingContactOption(props) {
       try {
         const dataset = await getSolidDataset(target, { fetch: session.fetch });
         if (!dataset) {
-          setName("Failed to load profile name");
+          setName("Failed to load target WebID");
           return;
         }
         const thing = getThing(dataset, target);
 
         if (!thing) {
-          setName("Failed to load profile name");
+          setName("Failed to find target");
           return;
         }
         const name =

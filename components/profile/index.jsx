@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /**
  * Copyright 2021 Inrupt Inc.
  *
@@ -126,14 +127,15 @@ export default function ProfileView(props) {
 export function ProfileCard(props) {
   const { session } = useSession();
   const { webId } = session.info;
-  const { uri, maxWidth, editable } = props;
+  const { uri, maxWidth, editable, small } = props;
   const [edit, setEdit] = useState(false);
   const target = uri || webId;
   const width = maxWidth || "100%";
+  const size = small ? 4 : 2;
 
   const { thing, error } = useThing(target, target);
 
-  function createCardLabel(label, size) {
+  function createCardLabel(label) {
     return (
       <Grid item xs={12} sm={size} md={size - 1}>
         <Label>{label}</Label>
@@ -141,16 +143,22 @@ export function ProfileCard(props) {
     );
   }
 
-  function createCardIcon(IconComponent, size) {
+  function createCardIcon(IconComponent) {
     return (
       <Grid item xs={12} sm={size} md={size - 1}>
         {IconComponent}
       </Grid>
     );
   }
-  function createCardEntry(property, size, edit) {
+  function createCardEntry(property) {
     return (
-      <Grid item xs={12} sm={size} md={size + 1} className="valueParent">
+      <Grid
+        item
+        xs={12}
+        sm={12 - size}
+        md={12 - size + 1}
+        className="valueParent"
+      >
         {editable ? (
           <Value property={property} edit={edit} thing={thing} autosave />
         ) : (
@@ -175,20 +183,20 @@ export function ProfileCard(props) {
     }
     return (
       <Grid container spacing={2}>
-        <Grid item sm={9} xs={12}>
+        <Grid item lg={small ? 12 : 8} md={12}>
           <Grid container spacing={2}>
-            {createCardLabel("Name", 2)}
-            {createCardEntry(VCARD.fn, 10, edit)}
-            {createCardLabel("Title", 2)}
-            {createCardEntry(VCARD.title, 10, edit)}
-            {createCardIcon(<BusinessIcon />, 2)}
-            {createCardEntry(VCARD.organization_name, 10, edit)}
-            {createCardIcon(<PhoneIcon />, 2)}
-            {createCardEntry(VCARD.hasTelephone, 10, edit)}
-            {createCardIcon(<EmailIcon />, 2)}
-            {createCardEntry(VCARD.hasEmail, 10, edit)}
-            {createCardIcon(<MessageIcon />, 2)}
-            {createCardEntry(VCARD.hasInstantMessage, 10, edit)}
+            {createCardLabel("Name")}
+            {createCardEntry(VCARD.fn)}
+            {createCardLabel("Title")}
+            {createCardEntry(VCARD.title)}
+            {createCardIcon(<BusinessIcon />)}
+            {createCardEntry(VCARD.organization_name)}
+            {createCardIcon(<PhoneIcon />)}
+            {createCardEntry(VCARD.hasTelephone)}
+            {createCardIcon(<EmailIcon />)}
+            {createCardEntry(VCARD.hasEmail)}
+            {createCardIcon(<MessageIcon />)}
+            {createCardEntry(VCARD.hasInstantMessage)}
             {editable && webId && target === webId && (
               <Button onClick={() => setEdit(!edit)}>
                 {edit ? "Finish editing profile" : "Edit Profile information"}
@@ -196,12 +204,13 @@ export function ProfileCard(props) {
             )}
           </Grid>
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid item lg={small ? 12 : 4} md={12}>
           <ProfileAvatar
             property={VCARD.hasPhoto}
             edit={edit}
+            thingUrl={session.info.webId}
             autosave
-            size="100%"
+            size={small ? "20vh" : "40vh"}
           />
         </Grid>
       </Grid>

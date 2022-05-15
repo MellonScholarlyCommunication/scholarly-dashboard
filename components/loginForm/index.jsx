@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LoginButton } from "@inrupt/solid-ui-react";
+import { login } from "@inrupt/solid-client-authn-browser";
 import {
   LinkButton,
   Input,
@@ -7,6 +7,7 @@ import {
   createStyles,
 } from "@inrupt/prism-react-components";
 import { useBem } from "@solid/lit-prism-patterns";
+import { Button } from "@material-ui/core";
 import styles from "./styles";
 import config from "../../config";
 
@@ -24,6 +25,17 @@ export default function LoginForm() {
     setCurrentUrl(window.location.href);
   }, [setCurrentUrl]);
 
+  async function handleLogin() {
+    const clientName = CONFIG.demoTitle;
+    const oidcIssuer = idp;
+    const redirectUrl = currentUrl;
+    await login({
+      oidcIssuer,
+      redirectUrl,
+      clientName,
+    });
+  }
+
   return (
     <div className={classes.loginFormContainer}>
       <Input
@@ -33,19 +45,14 @@ export default function LoginForm() {
         defaultValue={idp}
         onChange={(e) => setIdp(e.target.value)}
       />
-      <LoginButton
-        authOptions={{ clientName: CONFIG.demoTitle }}
-        oidcIssuer={idp}
-        redirectUrl={currentUrl}
-        onError={console.error}
-      >
+      <Button onClick={handleLogin}>
         <LinkButton
           variant="small"
           className={bem("user-menu__list-item-trigger")}
         >
           Log In
         </LinkButton>
-      </LoginButton>
+      </Button>
     </div>
   );
 }

@@ -16,6 +16,23 @@ export default function ErrorComponent(props) {
   );
 }
 
+export function ErrorCard(props) {
+  const { message, uri } = props;
+  return (
+    <div>
+      <b>uri: {uri}</b>
+      <br />
+      <small>
+        <label style={{ color: "red" }}>
+          {`The requested resource ${
+            uri && `at ${uri}`
+          } could not be retrieved: ${message || "Unknown error"}`}
+        </label>
+      </small>
+    </div>
+  );
+}
+
 export function LoginRequestWrapper(props) {
   const { session } = useSession();
   const { isLoggedIn } = session.info;

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DCTERMS, VCARD } from "@inrupt/lit-generated-vocab-common";
 import { getStringNoLocale, getUrl, getUrlAll } from "@inrupt/solid-client";
+// eslint-disable-next-line import/no-cycle
 import { EventListingComponent } from "../eventLog";
 import {
   getArtefactMetadataThings,

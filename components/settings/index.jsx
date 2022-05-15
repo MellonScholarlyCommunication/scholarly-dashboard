@@ -132,10 +132,7 @@ export function SettingsView() {
                 </Grid>
 
                 <Grid item xs={12} sm={3}>
-                  <b>
-                    Orchestrator id WebId of the orchestrator that manages this
-                    data pod.
-                  </b>
+                  <b>WebId of the orchestrator managing this data pod.</b>
                 </Grid>
                 <Grid item xs={12} sm={9} className="valueParent">
                   <Value

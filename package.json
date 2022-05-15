@@ -26,6 +26,7 @@
     "@inrupt/lit-generated-vocab-common": "^0.3.11",
     "@inrupt/prism-react-components": "^0.13.3",
     "@inrupt/solid-client": "^1.12.0",
+    "@inrupt/solid-client-authn-browser": "^1.11.7",
     "@inrupt/solid-ui-react": "^2.3.1",
     "@inrupt/vocab-common-rdf": "^1.0.1",
     "@inrupt/vocab-solid": "^1.0.1",

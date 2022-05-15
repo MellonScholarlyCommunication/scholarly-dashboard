@@ -11,17 +11,18 @@ import {
   setThing,
   setUrl,
 } from "@inrupt/solid-client";
-import { VCARD } from "@inrupt/lit-generated-vocab-common";
+import { FOAF, VCARD } from "@inrupt/lit-generated-vocab-common";
 import { Avatar, Button } from "@material-ui/core";
 import { Input } from "@inrupt/prism-react-components";
 
 export default function ProfileAvatar(props) {
-  const { edit, size } = props;
+  const { edit, size, thingUrl } = props;
   const { solidDataset: dataset, setDataset } = useContext(DatasetContext);
-  const thingURL = getSourceUrl(dataset);
+  const webIdUrl = thingUrl || getSourceUrl(dataset);
   const { fetch } = useContext(SessionContext);
-  let { thing } = useThing(thingURL, thingURL);
-  const profileImageURL = thing && getUrl(thing, VCARD.hasPhoto);
+  let { thing } = useThing(webIdUrl, webIdUrl);
+  const profileImageURL =
+    thing && (getUrl(thing, VCARD.hasPhoto) || getUrl(thing, FOAF.img));
 
   const [imageURL, setImageURL] = useState(profileImageURL);
 

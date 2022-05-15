@@ -90,14 +90,15 @@ function EventCardComponent(props) {
   function createAccordion(label, thing, property) {
     const url = getUrl(thing, property);
     return url ? (
-      <Accordion>
+      <Accordion mountOnEnter>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls={`${asUrl(thing)}-panel-${label}-content`}
           id={`${asUrl(thing)}-panel-${label}-header`}
+          style={{ width: "100%" }}
         >
           <Label>
-            {label}: {}
+            <b style={{ paddingLeft: "1em" }}>{label}</b>
           </Label>
         </AccordionSummary>
         <AccordionDetails>

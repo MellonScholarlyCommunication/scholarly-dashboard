@@ -1,6 +1,5 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable import/no-cycle */
-import { useState, useEffect } from "react";
 import { useThing } from "@inrupt/solid-ui-react";
 
 import {
@@ -9,19 +8,18 @@ import {
   getDatetimeAll,
   getDecimalAll,
   getIntegerAll,
-  getStringNoLocale,
   getStringNoLocaleAll,
-  getUrl,
   getUrlAll,
 } from "@inrupt/solid-client";
 import { RDF } from "@inrupt/lit-generated-vocab-common";
-import { Card, CardContent } from "@material-ui/core";
+import { Button, Card, CardContent } from "@material-ui/core";
 import { Label } from "@inrupt/prism-react-components";
-import ErrorComponent from "../error";
+import { ErrorCard } from "../error";
 import LoadingComponent from "../loading";
 import {
   getPredicateName,
   NOTIFICATIONTYPES,
+  openInNewTab,
   PERSONTYPES,
 } from "../../utils/util";
 import { ProfileCard } from "../profile";
@@ -33,7 +31,6 @@ export function CardViewerComponent(props) {
 
   function getCard() {
     const types = getUrlAll(thing, RDF.type);
-    console.log("TYPES", types, Object.keys(thing.predicates));
 
     for (const type of types) {
       if (PERSONTYPES.indexOf(type) !== -1) {
@@ -47,7 +44,15 @@ export function CardViewerComponent(props) {
   }
 
   function getView() {
-    if (error) return <ErrorComponent message={error.message} uri={target} />;
+    // Try to show non rdf resources
+    if (target.toString().endsWith(".html")) {
+      return <LandingPageCard target={target} type="html" />;
+    }
+    if (target.toString().endsWith(".pdf")) {
+      return <LandingPageCard target={target} type="pdf" />;
+    }
+
+    if (error) return <ErrorCard message={error.message} uri={target} />;
     if (!thing) return <LoadingComponent />;
     return getCard();
   }
@@ -92,4 +97,21 @@ function getAll(thing, property) {
     .concat(getIntegerAll(thing, property))
     .concat(getStringNoLocaleAll(thing, property));
   return stringRepresentations.join(", ");
+}
+
+function LandingPageCard(props) {
+  console.log("target", target);
+  const { target, type } = props;
+  return (
+    <div>
+      <b>uri</b>: <small>{target}</small>
+      <br />
+      <Button
+        style={{ backgroundColor: "lightblue" }}
+        onClick={() => openInNewTab(target)}
+      >
+        {type === "pdf" ? "Open PDF" : "Open Landing Page"}
+      </Button>
+    </div>
+  );
 }
